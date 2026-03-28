@@ -1,0 +1,14 @@
+build/
+out/
+imgui.ini
+docs/html/
+.vs/
+.cache/
+CMakeSettings.json
+CMakeUserPresets.json
+*.user
+*.suo
+logs/
+*emb
+*.bat
+*.json

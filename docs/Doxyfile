@@ -1,0 +1,29 @@
+# Doxyfile for embview
+
+PROJECT_NAME           = "embview"
+PROJECT_NUMBER         = 0.1.0
+PROJECT_BRIEF          = "Embedded Microcontroller Analysis Tool"
+
+OUTPUT_DIRECTORY       = .
+INPUT                  = ../src
+FILE_PATTERNS          = *.h
+RECURSIVE              = YES
+
+EXTRACT_ALL            = YES
+EXTRACT_PRIVATE        = NO
+EXTRACT_STATIC         = YES
+
+GENERATE_HTML          = YES
+GENERATE_LATEX         = NO
+
+HTML_OUTPUT            = html
+HTML_THEME             = light
+
+QUIET                  = YES
+WARNINGS               = YES
+WARN_IF_UNDOCUMENTED   = YES
+
+SOURCE_BROWSER         = YES
+INLINE_SOURCES         = NO
+
+OPTIMIZE_OUTPUT_FOR_C  = NO
