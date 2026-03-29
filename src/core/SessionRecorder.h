@@ -34,7 +34,7 @@ namespace embview::core
 
         bool isRecording() const;
 
-        std::vector<DataFrame> loadSession(const std::filesystem::path& path);
+        static std::vector<DataFrame> loadSession(const std::filesystem::path& path);
 
         std::size_t recordedFrameCount() const;
 

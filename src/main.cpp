@@ -18,18 +18,18 @@ int main(int argc, char* argv[])
     {
         spdlog::set_level(spdlog::level::info);
 
-        auto logFileMgr = std::make_shared<embview::core::LogFileManager>();
+        const auto logFileMgr = std::make_shared<embview::core::LogFileManager>();
         logFileMgr->init();
 
         std::vector<std::string> args(argv + 1, argv + argc);
 
-        bool cliMode = std::find(args.begin(), args.end(), "--cli") != args.end();
+        const bool cliMode = std::ranges::find(args.begin(), args.end(), "--cli") != args.end();
 
         int result = 0;
 
         if (cliMode)
         {
-            args.erase(std::remove(args.begin(), args.end(), "--cli"), args.end());
+            args.erase(std::ranges::remove(args, "--cli").begin(), args.end());
 
             embview::cli::CliApp cli;
             result = cli.run(args);

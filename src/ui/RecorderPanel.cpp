@@ -18,7 +18,7 @@ RecorderPanel::RecorderPanel(std::shared_ptr<core::DataStore> dataStore,
     , m_recorder(std::move(recorder))
 {
     // Generate default filename with timestamp
-    auto now = std::chrono::system_clock::now();
+    const auto now = std::chrono::system_clock::now();
     auto time = std::chrono::system_clock::to_time_t(now);
     std::tm tm{};
 #ifdef _WIN32
@@ -45,7 +45,7 @@ void RecorderPanel::render(bool& open)
 
     ImGui::InputText("Filename", m_filename, sizeof(m_filename));
 
-    bool recording = m_recorder->isRecording();
+    const bool recording = m_recorder->isRecording();
 
     if (recording)
     {
@@ -76,7 +76,7 @@ void RecorderPanel::render(bool& open)
     {
         try
         {
-            auto frames = m_recorder->loadSession(loadPath);
+            const auto frames = core::SessionRecorder::loadSession(loadPath);
             if (!frames.empty())
             {
                 m_dataStore->clear();

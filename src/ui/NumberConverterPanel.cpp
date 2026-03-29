@@ -51,11 +51,11 @@ namespace
             }
         }
 
-        auto result = std::from_chars(start, s.c_str() + s.size(), outVal, base);
-        return result.ec == std::errc{};
+        auto [ptr, ec] = std::from_chars(start, s.c_str() + s.size(), outVal, base);
+        return ec == std::errc{};
     }
 
-    std::string toBinaryString(uint64_t val, int bits)
+    std::string toBinaryString(const uint64_t val, const int bits)
     {
         std::string result;
         for (int i = bits - 1; i >= 0; --i)
@@ -96,14 +96,14 @@ void NumberConverterPanel::render(bool& open)
         return;
     }
 
-    int bits = 8 << m_bitWidth; // 8, 16, 32, 64
-    uint64_t mask = (bits == 64) ? ~0ULL : ((1ULL << bits) - 1);
+    const int bits = 8 << m_bitWidth; // 8, 16, 32, 64
+    const uint64_t mask = (bits == 64) ? ~0ULL : ((1ULL << bits) - 1);
     val &= mask;
 
     // Decimal display
     if (m_isSigned)
     {
-        int64_t signedVal = static_cast<int64_t>(val);
+        auto signedVal = static_cast<int64_t>(val);
         // Sign-extend if needed
         if (bits < 64 && (val & (1ULL << (bits - 1))))
         {
@@ -133,7 +133,7 @@ void NumberConverterPanel::render(bool& open)
     if (bits == 32)
     {
         float f;
-        uint32_t u32 = static_cast<uint32_t>(val);
+        const auto u32 = static_cast<uint32_t>(val);
         std::memcpy(&f, &u32, sizeof(float));
         ImGui::Text("Float32:  %g", static_cast<double>(f));
     }

@@ -30,12 +30,12 @@ bool UdpTransport::open()
 
     if (m_config.broadcast)
     {
-        int optval = 1;
+        constexpr int optval = 1;
         m_socket.setOption(SOL_SOCKET, SO_BROADCAST, optval);
     }
 
     {
-        int optval = 1;
+        constexpr int optval = 1;
         m_socket.setOption(SOL_SOCKET, SO_REUSEADDR, optval);
     }
 
@@ -76,7 +76,7 @@ bool UdpTransport::isOpen() const
     return m_isOpen;
 }
 
-std::vector<uint8_t> UdpTransport::read(std::size_t maxBytes)
+std::vector<uint8_t> UdpTransport::read(const std::size_t maxBytes)
 {
     if (!m_isOpen)
     {
@@ -84,7 +84,7 @@ std::vector<uint8_t> UdpTransport::read(std::size_t maxBytes)
     }
 
     std::vector<uint8_t> buffer(maxBytes);
-    int result = m_socket.recvFrom(buffer.data(), maxBytes);
+    const int result = m_socket.recvFrom(buffer.data(), maxBytes);
 
     if (result == -1) // Would block
     {

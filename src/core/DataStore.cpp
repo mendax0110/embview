@@ -1,10 +1,11 @@
 #include "core/DataStore.h"
 #include "core/DiagnosticRegistry.h"
 #include <mutex>
+#include <ranges>
 
 using namespace embview::core;
 
-DataStore::DataStore(std::size_t maxSamplesPerChannel)
+DataStore::DataStore(const std::size_t maxSamplesPerChannel)
     : m_maxSamples(maxSamplesPerChannel)
 {
     DIAG_REGISTER_MUTEX("DataStore::m_mutex", &m_mutex);
@@ -27,10 +28,10 @@ void DataStore::push(const DataFrame& frame)
     }
 }
 
-std::vector<DataFrame> DataStore::getChannel(uint16_t channel) const
+std::vector<DataFrame> DataStore::getChannel(const uint16_t channel) const
 {
     std::shared_lock lock(m_mutex);
-    auto it = m_channels.find(channel);
+    const auto it = m_channels.find(channel);
     if (it == m_channels.end())
     {
         return {};
@@ -43,17 +44,17 @@ std::vector<uint16_t> DataStore::getActiveChannels() const
     std::shared_lock lock(m_mutex);
     std::vector<uint16_t> result;
     result.reserve(m_channels.size());
-    for (const auto& [channel, _] : m_channels)
+    for (const auto& channel: m_channels | std::views::keys)
     {
         result.push_back(channel);
     }
     return result;
 }
 
-std::size_t DataStore::getChannelSize(uint16_t channel) const
+std::size_t DataStore::getChannelSize(const uint16_t channel) const
 {
     std::shared_lock lock(m_mutex);
-    auto it = m_channels.find(channel);
+    const auto it = m_channels.find(channel);
     if (it == m_channels.end())
     {
         return 0;
@@ -67,7 +68,7 @@ void DataStore::clear()
     m_channels.clear();
 }
 
-void DataStore::clearChannel(uint16_t channel)
+void DataStore::clearChannel(const uint16_t channel)
 {
     std::unique_lock lock(m_mutex);
     m_channels.erase(channel);

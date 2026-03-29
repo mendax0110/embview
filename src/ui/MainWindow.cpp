@@ -208,8 +208,8 @@ void MainWindow::renderMenuBar()
 
 void MainWindow::renderStatusBar()
 {
-    ImGuiViewport* viewport = ImGui::GetMainViewport();
-    float height = ImGui::GetFrameHeight();
+    const ImGuiViewport* viewport = ImGui::GetMainViewport();
+    const float height = ImGui::GetFrameHeight();
 
     if (viewport->WorkSize.x < 1.0f || viewport->WorkSize.y < height + 1.0f)
     {
@@ -220,7 +220,7 @@ void MainWindow::renderStatusBar()
     ImGui::SetNextWindowSize(ImVec2(viewport->WorkSize.x, height));
     ImGui::SetNextWindowViewport(viewport->ID);
 
-    ImGuiWindowFlags flags =
+    constexpr ImGuiWindowFlags flags =
         ImGuiWindowFlags_NoDecoration |
         ImGuiWindowFlags_NoDocking |
         ImGuiWindowFlags_NoMove |
@@ -235,7 +235,7 @@ void MainWindow::renderStatusBar()
     ImGui::PopStyleVar(2);
     ImGui::PopStyleColor();
 
-    auto deviceCount = m_deviceMgr->deviceCount();
+    const auto deviceCount = m_deviceMgr->deviceCount();
     if (deviceCount > 0)
     {
         ImGui::TextColored(ImVec4(0.3f, 0.85f, 0.45f, 1.0f), "CONNECTED (%d)", static_cast<int>(deviceCount));
@@ -246,12 +246,12 @@ void MainWindow::renderStatusBar()
     }
 
     ImGui::SameLine();
-    auto channels = m_dataStore->getActiveChannels();
+    const auto channels = m_dataStore->getActiveChannels();
     ImGui::Text("| Channels: %d", static_cast<int>(channels.size()));
 
-    double currentTime = ImGui::GetTime();
+    const double currentTime = ImGui::GetTime();
     std::size_t totalFrames = 0;
-    for (auto ch : channels)
+    for (const auto ch : channels)
     {
         totalFrames += m_dataStore->getChannelSize(ch);
     }
@@ -280,11 +280,11 @@ void MainWindow::renderStatusBar()
 
 void MainWindow::renderDockSpace()
 {
-    ImGuiViewport* viewport = ImGui::GetMainViewport();
-    float statusBarHeight = ImGui::GetFrameHeight();
+    const ImGuiViewport* viewport = ImGui::GetMainViewport();
+    const float statusBarHeight = ImGui::GetFrameHeight();
 
-    float dockW = viewport->WorkSize.x;
-    float dockH = viewport->WorkSize.y - statusBarHeight;
+    const float dockW = viewport->WorkSize.x;
+    const float dockH = viewport->WorkSize.y - statusBarHeight;
 
     if (dockW < 1.0f || dockH < 1.0f)
     {
@@ -312,14 +312,14 @@ void MainWindow::renderDockSpace()
     ImGui::Begin("DockSpace", nullptr, windowFlags);
     ImGui::PopStyleVar(3);
 
-    ImGuiID dockspaceId = ImGui::GetID("MainDockSpace");
+    const ImGuiID dockspaceId = ImGui::GetID("MainDockSpace");
 
-    float currentW = dockW;
-    float currentH = dockH;
+    const float currentW = dockW;
+    const float currentH = dockH;
     if (m_autoScaleLayout && m_lastLayoutWidth > 0.0f)
     {
-        float widthRatio = currentW / m_lastLayoutWidth;
-        float heightRatio = currentH / m_lastLayoutHeight;
+        const float widthRatio = currentW / m_lastLayoutWidth;
+        const float heightRatio = currentH / m_lastLayoutHeight;
         if (widthRatio < 0.75f || widthRatio > 1.33f || heightRatio < 0.75f || heightRatio > 1.33f)
         {
             m_needsLayoutRebuild = true;
@@ -342,13 +342,13 @@ void MainWindow::renderDockSpace()
     ImGui::End();
 }
 
-void MainWindow::buildDefaultLayout(ImGuiID dockspaceId)
+void MainWindow::buildDefaultLayout(const ImGuiID dockspaceId)
 {
     ImGui::DockBuilderRemoveNode(dockspaceId);
     ImGui::DockBuilderAddNode(dockspaceId, ImGuiDockNodeFlags_DockSpace);
 
-    ImGuiViewport* viewport = ImGui::GetMainViewport();
-    float statusBarHeight = ImGui::GetFrameHeight();
+    const ImGuiViewport* viewport = ImGui::GetMainViewport();
+    const float statusBarHeight = ImGui::GetFrameHeight();
     float w = viewport->WorkSize.x;
     float h = viewport->WorkSize.y - statusBarHeight;
 

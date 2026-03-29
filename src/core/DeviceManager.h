@@ -53,10 +53,10 @@ namespace embview::core
         std::size_t deviceCount() const;
 
         /// @brief Send a command frame to a specific device (binary protocol encoding).
-        void sendCommand(const std::string& deviceName, const DataFrame& frame);
+        void sendCommand(const std::string& deviceName, const DataFrame& frame) const;
 
         /// @brief Send raw bytes to a specific device (no protocol encoding).
-        void sendRaw(const std::string& deviceName, std::span<const uint8_t> data);
+        void sendRaw(const std::string& deviceName, std::span<const uint8_t> data) const;
 
         /// @brief Get the shared raw data buffer for hex view.
         std::shared_ptr<RawDataBuffer> getRawDataBuffer() const;
@@ -71,7 +71,7 @@ namespace embview::core
             std::jthread readerThread;
         };
 
-        void readerLoop(DeviceSession& session, std::stop_token stopToken);
+        void readerLoop(DeviceSession& session, const std::stop_token &stopToken) const;
         uint8_t nextDeviceIndex();
 
         std::shared_ptr<DataStore> m_dataStore;

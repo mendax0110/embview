@@ -17,7 +17,7 @@ StatsPanel::StatsPanel(std::shared_ptr<core::DataStore> dataStore)
 
 StatsPanel::~StatsPanel() = default;
 
-void StatsPanel::render(bool& open)
+void StatsPanel::render(bool& open) const
 {
     if (!ImGui::Begin("Statistics", &open))
     {
@@ -26,7 +26,7 @@ void StatsPanel::render(bool& open)
     }
 
     auto channels = m_dataStore->getActiveChannels();
-    std::sort(channels.begin(), channels.end());
+    std::ranges::sort(channels.begin(), channels.end());
 
     if (channels.empty())
     {
@@ -47,7 +47,7 @@ void StatsPanel::render(bool& open)
         ImGui::TableSetupColumn("Latest");
         ImGui::TableHeadersRow();
 
-        for (uint16_t ch : channels)
+        for (const uint16_t ch : channels)
         {
             auto frames = m_dataStore->getChannel(ch);
             if (frames.empty())
@@ -66,18 +66,18 @@ void StatsPanel::render(bool& open)
                 sum += f.value;
             }
 
-            double mean = sum / static_cast<double>(frames.size());
+            const double mean = sum / static_cast<double>(frames.size());
 
             double sqDiffSum = 0.0;
             for (const auto& f : frames)
             {
-                double diff = f.value - mean;
+                const double diff = f.value - mean;
                 sqDiffSum += diff * diff;
             }
-            double stddev = std::sqrt(sqDiffSum / static_cast<double>(frames.size()));
+            const double stddev = std::sqrt(sqDiffSum / static_cast<double>(frames.size()));
 
-            uint8_t devIdx = static_cast<uint8_t>(ch / 256);
-            uint8_t rawCh = static_cast<uint8_t>(ch % 256);
+            const auto devIdx = static_cast<uint8_t>(ch / 256);
+            const auto rawCh = static_cast<uint8_t>(ch % 256);
 
             ImGui::TableNextRow();
             ImGui::TableNextColumn();

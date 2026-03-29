@@ -18,7 +18,7 @@ LogFileManager::~LogFileManager()
     if (m_fileSink)
     {
         auto& sinks = spdlog::default_logger()->sinks();
-        sinks.erase(std::remove(sinks.begin(), sinks.end(), m_fileSink), sinks.end());
+        sinks.erase(std::ranges::remove(sinks, m_fileSink).begin(), sinks.end());
     }
 }
 
@@ -85,7 +85,7 @@ std::vector<std::filesystem::path> LogFileManager::listLogs() const
     }
 
     // Sort newest first, using error_code overload to handle deleted files
-    std::sort(result.begin(), result.end(), [](const auto& a, const auto& b)
+    std::ranges::sort(result, [](const auto& a, const auto& b)
     {
         std::error_code ecA, ecB;
         auto timeA = std::filesystem::last_write_time(a, ecA);
@@ -97,7 +97,7 @@ std::vector<std::filesystem::path> LogFileManager::listLogs() const
     return result;
 }
 
-void LogFileManager::deleteLog(const std::filesystem::path& path)
+void LogFileManager::deleteLog(const std::filesystem::path& path) const
 {
     if (path == m_currentLog)
     {
@@ -113,9 +113,9 @@ void LogFileManager::deleteLog(const std::filesystem::path& path)
     }
 }
 
-void LogFileManager::deleteOlderThan(std::chrono::hours maxAge)
+void LogFileManager::deleteOlderThan(const std::chrono::hours maxAge) const
 {
-    auto now = std::filesystem::file_time_type::clock::now();
+    const auto now = std::filesystem::file_time_type::clock::now();
 
     for (const auto& logPath : listLogs())
     {
@@ -131,7 +131,7 @@ void LogFileManager::deleteOlderThan(std::chrono::hours maxAge)
             continue;
         }
 
-        auto age = std::chrono::duration_cast<std::chrono::hours>(now - writeTime);
+        const auto age = std::chrono::duration_cast<std::chrono::hours>(now - writeTime);
         if (age > maxAge)
         {
             deleteLog(logPath);

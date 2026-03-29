@@ -24,7 +24,7 @@ void LogFilePanel::render(bool& open)
         return;
     }
 
-    auto currentLog = m_logMgr->currentLogPath();
+    const auto currentLog = m_logMgr->currentLogPath();
     ImGui::Text("Active: %s", currentLog.filename().string().c_str());
     ImGui::Separator();
 
@@ -37,7 +37,7 @@ void LogFilePanel::render(bool& open)
 
     ImGui::Separator();
 
-    auto logs = m_logMgr->listLogs();
+    const auto logs = m_logMgr->listLogs();
 
     if (ImGui::BeginTable("LogFiles", 3, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_Resizable))
     {
@@ -51,7 +51,7 @@ void LogFilePanel::render(bool& open)
             ImGui::TableNextRow();
             ImGui::TableNextColumn();
 
-            bool isCurrent = (logPath == currentLog);
+            const bool isCurrent = (logPath == currentLog);
             if (isCurrent)
             {
                 ImGui::TextColored(ImVec4(0.3f, 0.85f, 0.45f, 1.0f), "%s",
@@ -64,7 +64,7 @@ void LogFilePanel::render(bool& open)
 
             ImGui::TableNextColumn();
             std::error_code ec;
-            auto size = std::filesystem::file_size(logPath, ec);
+            const auto size = std::filesystem::file_size(logPath, ec);
             if (!ec)
             {
                 if (size >= 1024 * 1024)

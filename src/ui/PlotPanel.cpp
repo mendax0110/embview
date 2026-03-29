@@ -79,12 +79,12 @@ void PlotPanel::render(bool& open)
     ImGui::Checkbox("Channel Settings", &m_showChannelSettings);
 
     auto channels = m_dataStore->getActiveChannels();
-    std::sort(channels.begin(), channels.end());
+    std::ranges::sort(channels.begin(), channels.end());
 
     // Record frames if recording
     if (m_recorder && m_recorder->isRecording() && !m_paused)
     {
-        for (uint16_t ch : channels)
+        for (const uint16_t ch : channels)
         {
             auto frames = m_dataStore->getChannel(ch);
             for (const auto& f : frames)
@@ -97,7 +97,7 @@ void PlotPanel::render(bool& open)
     // Evaluate triggers
     if (m_triggerEngine && !m_paused)
     {
-        for (uint16_t ch : channels)
+        for (const uint16_t ch : channels)
         {
             auto frames = m_dataStore->getChannel(ch);
             if (!frames.empty())
@@ -119,53 +119,53 @@ void PlotPanel::render(bool& open)
     {
         if (ImGui::BeginChild("ChSettings", ImVec2(0, 150), ImGuiChildFlags_Border | ImGuiChildFlags_ResizeY))
         {
-            for (uint16_t ch : channels)
+            for (const uint16_t ch : channels)
             {
-                auto& cfg = getConfig(ch);
+                auto&[name, color, visible, expression] = getConfig(ch);
                 ImGui::PushID(ch);
 
-                ImGui::Checkbox("##vis", &cfg.visible);
+                ImGui::Checkbox("##vis", &visible);
                 ImGui::SameLine();
 
                 char nameBuf[64];
-                std::snprintf(nameBuf, sizeof(nameBuf), "%s", cfg.name.c_str());
+                std::snprintf(nameBuf, sizeof(nameBuf), "%s", name.c_str());
                 ImGui::SetNextItemWidth(120.0f);
                 if (ImGui::InputText("##name", nameBuf, sizeof(nameBuf)))
                 {
-                    cfg.name = nameBuf;
+                    name = nameBuf;
                 }
                 ImGui::SameLine();
 
-                bool useCustomColor = (cfg.color[3] > 0.0f);
+                bool useCustomColor = (color[3] > 0.0f);
                 if (ImGui::Checkbox("Color", &useCustomColor))
                 {
                     if (!useCustomColor)
                     {
-                        cfg.color[3] = 0.0f;
+                        color[3] = 0.0f;
                     }
                     else
                     {
                         auto col = ImPlot::GetColormapColor(ch);
-                        cfg.color[0] = col.x;
-                        cfg.color[1] = col.y;
-                        cfg.color[2] = col.z;
-                        cfg.color[3] = col.w;
+                        color[0] = col.x;
+                        color[1] = col.y;
+                        color[2] = col.z;
+                        color[3] = col.w;
                     }
                 }
                 if (useCustomColor)
                 {
                     ImGui::SameLine();
-                    ImGui::ColorEdit4("##color", cfg.color, ImGuiColorEditFlags_NoInputs);
+                    ImGui::ColorEdit4("##color", color, ImGuiColorEditFlags_NoInputs);
                 }
 
                 // Expression transform
                 ImGui::SameLine();
                 char exprBuf[128];
-                std::snprintf(exprBuf, sizeof(exprBuf), "%s", cfg.expression.c_str());
+                std::snprintf(exprBuf, sizeof(exprBuf), "%s", expression.c_str());
                 ImGui::SetNextItemWidth(200.0f);
                 if (ImGui::InputText("Expr", exprBuf, sizeof(exprBuf)))
                 {
-                    cfg.expression = exprBuf;
+                    expression = exprBuf;
                 }
                 if (ImGui::IsItemHovered())
                 {
@@ -181,13 +181,13 @@ void PlotPanel::render(bool& open)
                 }
 
                 // Show expression validation feedback
-                if (!cfg.expression.empty() && m_exprEval)
+                if (!expression.empty() && m_exprEval)
                 {
                     m_exprEval->setVariable("x", 0.0);
                     m_exprEval->setVariable("t", 0.0);
-                    uint8_t rawCh = static_cast<uint8_t>(ch % 256);
+                    const auto rawCh = static_cast<uint8_t>(ch % 256);
                     m_exprEval->setVariable("ch" + std::to_string(rawCh), 0.0);
-                    m_exprEval->evaluate(cfg.expression);
+                    m_exprEval->evaluate(expression);
                     if (m_exprEval->hasError())
                     {
                         ImGui::SameLine();
@@ -218,8 +218,8 @@ void PlotPanel::render(bool& open)
     {
         if (m_markerText[0] != '\0' && !channels.empty())
         {
-            auto frames = m_dataStore->getChannel(channels.front());
-            double ts = frames.empty() ? 0.0 : frames.back().timestamp;
+            const auto frames = m_dataStore->getChannel(channels.front());
+            const double ts = frames.empty() ? 0.0 : frames.back().timestamp;
             m_markers.push_back({ts, std::string(m_markerText)});
             m_markerText[0] = '\0';
         }
@@ -236,10 +236,10 @@ void PlotPanel::render(bool& open)
             ImPlot::SetupAxisLimits(ImAxis_Y1, 0, 1, ImPlotCond_Once);
         }
 
-        for (uint16_t ch : channels)
+        for (const uint16_t ch : channels)
         {
-            auto& cfg = getConfig(ch);
-            if (!cfg.visible)
+            auto&[name, color, visible, expression] = getConfig(ch);
+            if (!visible)
             {
                 continue;
             }
@@ -254,17 +254,17 @@ void PlotPanel::render(bool& open)
             xs.reserve(frames.size());
             ys.reserve(frames.size());
 
-            bool hasExpr = !cfg.expression.empty() && m_exprEval;
+            const bool hasExpr = !expression.empty() && m_exprEval;
 
             // Pre-load all channel latest values so cross-channel expressions work
             if (hasExpr)
             {
-                for (uint16_t otherCh : channels)
+                for (const uint16_t otherCh : channels)
                 {
                     auto otherFrames = m_dataStore->getChannel(otherCh);
                     if (!otherFrames.empty())
                     {
-                        uint8_t rawCh = static_cast<uint8_t>(otherCh % 256);
+                        const auto rawCh = static_cast<uint8_t>(otherCh % 256);
                         m_exprEval->setVariable("ch" + std::to_string(rawCh), otherFrames.back().value);
                         m_exprEval->setChannelValue(otherCh, otherFrames.back().value);
                     }
@@ -279,13 +279,13 @@ void PlotPanel::render(bool& open)
 
                 if (hasExpr)
                 {
-                    uint8_t rawCh = static_cast<uint8_t>(ch % 256);
+                    auto rawCh = static_cast<uint8_t>(ch % 256);
                     m_exprEval->setVariable("ch" + std::to_string(rawCh), f.value);
                     m_exprEval->setChannelValue(ch, f.value);
                     m_exprEval->setVariable("x", f.value);
                     m_exprEval->setVariable("t", f.timestamp);
 
-                    double result = m_exprEval->evaluate(cfg.expression);
+                    double result = m_exprEval->evaluate(expression);
                     if (m_exprEval->hasError())
                     {
                         if (!exprErrorLogged)
@@ -307,27 +307,27 @@ void PlotPanel::render(bool& open)
                 }
             }
 
-            if (cfg.color[3] > 0.0f)
+            if (color[3] > 0.0f)
             {
-                ImPlot::SetNextLineStyle(ImVec4(cfg.color[0], cfg.color[1], cfg.color[2], cfg.color[3]));
+                ImPlot::SetNextLineStyle(ImVec4(color[0], color[1], color[2], color[3]));
             }
 
-            ImPlot::PlotLine(cfg.name.c_str(), xs.data(), ys.data(), static_cast<int>(xs.size()));
+            ImPlot::PlotLine(name.c_str(), xs.data(), ys.data(), static_cast<int>(xs.size()));
         }
 
         // Draw markers
-        for (const auto& marker : m_markers)
+        for (const auto&[timestamp, text] : m_markers)
         {
-            double x = marker.timestamp;
+            double x = timestamp;
             ImPlot::DragLineX(0, &x, ImVec4(1, 1, 0, 0.7f), 1.0f);
-            ImPlot::Annotation(marker.timestamp, 0, ImVec4(1, 1, 0.3f, 1), ImVec2(5, -5), true,
-                                "%s", marker.text.c_str());
+            ImPlot::Annotation(timestamp, 0, ImVec4(1, 1, 0.3f, 1), ImVec2(5, -5), true,
+                                "%s", text.c_str());
         }
 
         // Draw trigger threshold lines
         if (m_triggerEngine)
         {
-            auto& triggers = m_triggerEngine->triggers();
+            const auto& triggers = m_triggerEngine->triggers();
             for (std::size_t i = 0; i < triggers.size(); ++i)
             {
                 auto& t = triggers[i];
@@ -372,13 +372,13 @@ void PlotPanel::exportCsv()
         file << "timestamp,device,channel,value\n";
 
         auto channels = m_dataStore->getActiveChannels();
-        std::sort(channels.begin(), channels.end());
+        std::ranges::sort(channels.begin(), channels.end());
 
         for (uint16_t ch : channels)
         {
             auto frames = m_dataStore->getChannel(ch);
-            uint8_t devIdx = static_cast<uint8_t>(ch / 256);
-            uint8_t rawCh = static_cast<uint8_t>(ch % 256);
+            auto devIdx = static_cast<uint8_t>(ch / 256);
+            auto rawCh = static_cast<uint8_t>(ch % 256);
 
             for (const auto& f : frames)
             {

@@ -6,6 +6,7 @@
 #include <imgui.h>
 
 #include <algorithm>
+#include <ranges>
 
 using namespace embview::ui;
 
@@ -20,7 +21,7 @@ TriggerPanel::TriggerPanel(std::shared_ptr<core::TriggerEngine> engine,
 
 TriggerPanel::~TriggerPanel() = default;
 
-void TriggerPanel::render(bool& open)
+void TriggerPanel::render(bool& open) const
 {
     if (!ImGui::Begin("Triggers", &open))
     {
@@ -32,7 +33,7 @@ void TriggerPanel::render(bool& open)
     if (ImGui::Button("Add Trigger"))
     {
         core::TriggerConfig cfg;
-        auto channels = m_dataStore->getActiveChannels();
+        const auto channels = m_dataStore->getActiveChannels();
         if (!channels.empty())
         {
             cfg.channel = channels.front();
@@ -102,9 +103,9 @@ void TriggerPanel::render(bool& open)
 
     auto events = m_engine->recentEvents(50);
     ImGui::BeginChild("TriggerEvents", ImVec2(0, 0), ImGuiChildFlags_None, ImGuiWindowFlags_HorizontalScrollbar);
-    for (auto it = events.rbegin(); it != events.rend(); ++it)
+    for (auto & event : std::ranges::reverse_view(events))
     {
-        ImGui::TextColored(ImVec4(1.0f, 0.9f, 0.3f, 1.0f), "%s", it->message.c_str());
+        ImGui::TextColored(ImVec4(1.0f, 0.9f, 0.3f, 1.0f), "%s", event.message.c_str());
     }
     ImGui::EndChild();
 

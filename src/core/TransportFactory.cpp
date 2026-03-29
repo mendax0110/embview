@@ -53,7 +53,7 @@ void TransportFactory::registerCreator(const std::string& type, Creator creator)
 
 std::unique_ptr<ITransport> TransportFactory::create(const std::string& type, const nlohmann::json& config) const
 {
-    auto it = m_creators.find(type);
+    const auto it = m_creators.find(type);
     if (it == m_creators.end())
     {
         throw std::runtime_error("Unknown transport type: " + type);

@@ -78,11 +78,11 @@ void LogPanel::render(bool& open)
 
     ImGui::BeginChild("LogScroll", ImVec2(0, 0), ImGuiChildFlags_None, ImGuiWindowFlags_HorizontalScrollbar);
 
-    auto entries = m_sink->getEntries();
-    for (const auto& entry : entries)
+    const auto entries = m_sink->getEntries();
+    for (const auto&[level, message] : entries)
     {
         ImVec4 color;
-        switch (entry.level)
+        switch (level)
         {
             case spdlog::level::err:
             case spdlog::level::critical:
@@ -100,7 +100,7 @@ void LogPanel::render(bool& open)
         }
 
         ImGui::PushStyleColor(ImGuiCol_Text, color);
-        ImGui::TextUnformatted(entry.message.c_str());
+        ImGui::TextUnformatted(message.c_str());
         ImGui::PopStyleColor();
     }
 

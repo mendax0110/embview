@@ -12,3 +12,4 @@ logs/
 *emb
 *.bat
 *.json
+.idea

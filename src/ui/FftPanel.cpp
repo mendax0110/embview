@@ -18,7 +18,7 @@ FftPanel::FftPanel(std::shared_ptr<core::DataStore> dataStore)
 
 FftPanel::~FftPanel() = default;
 
-std::size_t FftPanel::nextPow2(std::size_t n)
+std::size_t FftPanel::nextPow2(const std::size_t n)
 {
     std::size_t p = 1;
     while (p < n)
@@ -57,27 +57,27 @@ void FftPanel::fft(std::vector<double>& real, std::vector<double>& imag)
     // Cooley-Tukey
     for (std::size_t len = 2; len <= n; len <<= 1)
     {
-        double angle = -2.0 * std::numbers::pi / static_cast<double>(len);
-        double wReal = std::cos(angle);
-        double wImag = std::sin(angle);
+        const double angle = -2.0 * std::numbers::pi / static_cast<double>(len);
+        const double wReal = std::cos(angle);
+        const double wImag = std::sin(angle);
 
         for (std::size_t i = 0; i < n; i += len)
         {
             double curReal = 1.0;
             double curImag = 0.0;
-            std::size_t half = len / 2;
+            const std::size_t half = len / 2;
 
             for (std::size_t j = 0; j < half; ++j)
             {
-                double tReal = curReal * real[i + j + half] - curImag * imag[i + j + half];
-                double tImag = curReal * imag[i + j + half] + curImag * real[i + j + half];
+                const double tReal = curReal * real[i + j + half] - curImag * imag[i + j + half];
+                const double tImag = curReal * imag[i + j + half] + curImag * real[i + j + half];
 
                 real[i + j + half] = real[i + j] - tReal;
                 imag[i + j + half] = imag[i + j] - tImag;
                 real[i + j] += tReal;
                 imag[i + j] += tImag;
 
-                double newReal = curReal * wReal - curImag * wImag;
+                const double newReal = curReal * wReal - curImag * wImag;
                 curImag = curReal * wImag + curImag * wReal;
                 curReal = newReal;
             }
@@ -94,7 +94,7 @@ void FftPanel::render(bool& open)
     }
 
     auto channels = m_dataStore->getActiveChannels();
-    std::sort(channels.begin(), channels.end());
+    std::ranges::sort(channels);
 
     if (channels.empty())
     {
@@ -107,9 +107,9 @@ void FftPanel::render(bool& open)
     ImGui::SetNextItemWidth(120.0f);
     if (ImGui::BeginCombo("Channel", std::to_string(m_selectedChannel).c_str()))
     {
-        for (uint16_t ch : channels)
+        for (const uint16_t ch : channels)
         {
-            bool selected = (ch == m_selectedChannel);
+            const bool selected = (ch == m_selectedChannel);
             if (ImGui::Selectable(std::to_string(ch).c_str(), selected))
             {
                 m_selectedChannel = ch;
@@ -126,7 +126,7 @@ void FftPanel::render(bool& open)
     ImGui::SameLine();
     if (ImGui::Button("Compute FFT"))
     {
-        auto frames = m_dataStore->getChannel(m_selectedChannel);
+        const auto frames = m_dataStore->getChannel(m_selectedChannel);
         if (!frames.empty())
         {
             std::size_t n = nextPow2(frames.size());
@@ -135,7 +135,7 @@ void FftPanel::render(bool& open)
             std::vector<double> real(n, 0.0);
             std::vector<double> imag(n, 0.0);
 
-            std::size_t copyCount = std::min(frames.size(), n);
+            const std::size_t copyCount = std::min(frames.size(), n);
             for (std::size_t i = 0; i < copyCount; ++i)
             {
                 real[i] = frames[frames.size() - copyCount + i].value;
@@ -144,22 +144,20 @@ void FftPanel::render(bool& open)
             // Apply Hanning window
             for (std::size_t i = 0; i < copyCount; ++i)
             {
-                double w = 0.5 * (1.0 - std::cos(2.0 * std::numbers::pi * static_cast<double>(i)
-                                                    / static_cast<double>(copyCount - 1)));
+                const double w = 0.5 * (1.0 - std::cos(2.0 * std::numbers::pi * static_cast<double>(i) / static_cast<double>(copyCount - 1)));
                 real[i] *= w;
             }
 
             fft(real, imag);
 
-            std::size_t halfN = n / 2;
+            const std::size_t halfN = n / 2;
             m_magnitudes.resize(halfN);
             m_frequencies.resize(halfN);
 
-            double freqStep = m_sampleRate / static_cast<double>(n);
+            const double freqStep = m_sampleRate / static_cast<double>(n);
             for (std::size_t i = 0; i < halfN; ++i)
             {
-                m_magnitudes[i] = 2.0 * std::sqrt(real[i] * real[i] + imag[i] * imag[i])
-                                  / static_cast<double>(n);
+                m_magnitudes[i] = 2.0 * std::sqrt(real[i] * real[i] + imag[i] * imag[i]) / static_cast<double>(n);
                 m_frequencies[i] = static_cast<double>(i) * freqStep;
             }
         }

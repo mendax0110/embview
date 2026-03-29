@@ -28,13 +28,13 @@ namespace embview::cli
          * @param args Command-line arguments (excluding program name).
          * @return Exit code (0 on success).
          */
-        int run(const std::vector<std::string>& args);
+        static int run(const std::vector<std::string>& args);
 
     private:
 
         /**
          * @brief Print usage information for the CLI application.
          */
-        void printUsage() const;
+        static void printUsage();
     };
 } // namespace embview::cli

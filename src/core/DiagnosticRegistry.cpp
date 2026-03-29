@@ -27,7 +27,7 @@ void DiagnosticRegistry::unregisterMutex(const std::string& name)
     m_mutexes.erase(name);
 }
 
-void DiagnosticRegistry::registerPtr(std::string name, void* ptr, std::size_t refCount)
+void DiagnosticRegistry::registerPtr(std::string name, void* ptr, const std::size_t refCount)
 {
     std::unique_lock lock(m_mutex);
     m_ptrs[std::move(name)] = PtrEntry{ptr, refCount};
@@ -39,10 +39,10 @@ void DiagnosticRegistry::unregisterPtr(const std::string& name)
     m_ptrs.erase(name);
 }
 
-void DiagnosticRegistry::updateRefCount(const std::string& name, std::size_t refCount)
+void DiagnosticRegistry::updateRefCount(const std::string& name, const std::size_t refCount)
 {
     std::unique_lock lock(m_mutex);
-    auto it = m_ptrs.find(name);
+    const auto it = m_ptrs.find(name);
     if (it != m_ptrs.end())
     {
         it->second.refCount = refCount;
@@ -87,7 +87,7 @@ std::string DiagnosticRegistry::snapshot() const
     return os.str();
 }
 
-void DiagnosticRegistry::dumpToLog()
+void DiagnosticRegistry::dumpToLog() const
 {
     spdlog::info("{}", snapshot());
 }

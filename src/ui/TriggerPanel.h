@@ -20,7 +20,7 @@ namespace embview::ui
                      std::shared_ptr<core::DataStore> dataStore);
         ~TriggerPanel();
 
-        void render(bool& open);
+        void render(bool& open) const;
 
     private:
         std::shared_ptr<core::TriggerEngine> m_engine;

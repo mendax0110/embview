@@ -21,7 +21,7 @@ std::size_t TriggerEngine::addTrigger(TriggerConfig config)
     return m_triggers.size() - 1;
 }
 
-void TriggerEngine::removeTrigger(std::size_t index)
+void TriggerEngine::removeTrigger(const std::size_t index)
 {
     std::lock_guard lock(m_mutex);
     if (index < m_triggers.size())
@@ -36,36 +36,36 @@ void TriggerEngine::evaluate(const DataFrame& frame)
 
     for (std::size_t i = 0; i < m_triggers.size(); ++i)
     {
-        auto& trig = m_triggers[i];
-        if (!trig.enabled || trig.channel != frame.channel)
+        auto&[channel, condition, threshold, enabled, label] = m_triggers[i];
+        if (!enabled || channel != frame.channel)
         {
             continue;
         }
 
         bool fired = false;
         double prevVal = 0.0;
-        bool hasPrev = m_lastValues.contains(i);
+        const bool hasPrev = m_lastValues.contains(i);
         if (hasPrev)
         {
             prevVal = m_lastValues[i];
         }
 
-        switch (trig.condition)
+        switch (condition)
         {
             case TriggerCondition::Above:
-                fired = frame.value > trig.threshold;
+                fired = frame.value > threshold;
                 break;
             case TriggerCondition::Below:
-                fired = frame.value < trig.threshold;
+                fired = frame.value < threshold;
                 break;
             case TriggerCondition::Equal:
-                fired = std::abs(frame.value - trig.threshold) < 1e-9;
+                fired = std::abs(frame.value - threshold) < 1e-9;
                 break;
             case TriggerCondition::RisingEdge:
-                fired = hasPrev && prevVal <= trig.threshold && frame.value > trig.threshold;
+                fired = hasPrev && prevVal <= threshold && frame.value > threshold;
                 break;
             case TriggerCondition::FallingEdge:
-                fired = hasPrev && prevVal >= trig.threshold && frame.value < trig.threshold;
+                fired = hasPrev && prevVal >= threshold && frame.value < threshold;
                 break;
         }
 
@@ -77,8 +77,8 @@ void TriggerEngine::evaluate(const DataFrame& frame)
             event.triggerIndex = i;
             event.frame = frame;
             event.message = std::format("[Trigger] {} ch={} val={:.4f} threshold={:.4f}",
-                                         trig.label.empty() ? std::format("#{}", i) : trig.label,
-                                         frame.channel, frame.value, trig.threshold);
+                                         label.empty() ? std::format("#{}", i) : label,
+                                         frame.channel, frame.value, threshold);
 
             spdlog::warn("{}", event.message);
             m_events.push_back(event);
@@ -102,7 +102,7 @@ std::vector<TriggerConfig>& TriggerEngine::triggers()
     return m_triggers;
 }
 
-std::vector<TriggerEvent> TriggerEngine::recentEvents(std::size_t maxCount) const
+std::vector<TriggerEvent> TriggerEngine::recentEvents(const std::size_t maxCount) const
 {
     std::lock_guard lock(m_mutex);
     if (m_events.size() <= maxCount)

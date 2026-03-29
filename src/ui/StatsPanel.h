@@ -18,7 +18,7 @@ namespace embview::ui
         explicit StatsPanel(std::shared_ptr<core::DataStore> dataStore);
         ~StatsPanel();
 
-        void render(bool& open);
+        void render(bool& open) const;
 
     private:
         std::shared_ptr<core::DataStore> m_dataStore;

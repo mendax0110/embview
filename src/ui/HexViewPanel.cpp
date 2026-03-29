@@ -50,7 +50,7 @@ void HexViewPanel::render(bool& open)
 
     // 16 bytes per row
     constexpr int BYTES_PER_ROW = 16;
-    std::size_t rowCount = (snapshot.size() + BYTES_PER_ROW - 1) / BYTES_PER_ROW;
+    const std::size_t rowCount = (snapshot.size() + BYTES_PER_ROW - 1) / BYTES_PER_ROW;
 
     ImGuiListClipper clipper;
     clipper.Begin(static_cast<int>(rowCount));
@@ -59,8 +59,8 @@ void HexViewPanel::render(bool& open)
     {
         for (int row = clipper.DisplayStart; row < clipper.DisplayEnd; ++row)
         {
-            std::size_t offset = static_cast<std::size_t>(row) * BYTES_PER_ROW;
-            std::size_t count = std::min(static_cast<std::size_t>(BYTES_PER_ROW),
+            const std::size_t offset = static_cast<std::size_t>(row) * BYTES_PER_ROW;
+            const std::size_t count = std::min(static_cast<std::size_t>(BYTES_PER_ROW),
                                           snapshot.size() - offset);
 
             // Address
@@ -89,8 +89,8 @@ void HexViewPanel::render(bool& open)
             pos += std::snprintf(line + pos, sizeof(line) - static_cast<std::size_t>(pos), " |");
             for (std::size_t i = 0; i < count; ++i)
             {
-                uint8_t b = snapshot[offset + i];
-                char c = (b >= 0x20 && b <= 0x7E) ? static_cast<char>(b) : '.';
+                const uint8_t b = snapshot[offset + i];
+                const char c = (b >= 0x20 && b <= 0x7E) ? static_cast<char>(b) : '.';
                 line[pos++] = c;
             }
             line[pos++] = '|';

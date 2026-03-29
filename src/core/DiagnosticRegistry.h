@@ -55,7 +55,7 @@ namespace embview::core
         std::string snapshot() const;
 
         /// @brief Write the snapshot to spdlog at info level.
-        void dumpToLog();
+        void dumpToLog() const;
 
     private:
         DiagnosticRegistry() = default;

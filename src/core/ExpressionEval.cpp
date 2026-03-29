@@ -8,12 +8,12 @@
 
 using namespace embview::core;
 
-void ExpressionEval::setVariable(const std::string& name, double value)
+void ExpressionEval::setVariable(const std::string& name, const double value)
 {
     m_variables[name] = value;
 }
 
-void ExpressionEval::setChannelValue(uint16_t channel, double value)
+void ExpressionEval::setChannelValue(const uint16_t channel, const double value)
 {
     m_variables["ch" + std::to_string(channel)] = value;
 }
@@ -27,7 +27,7 @@ double ExpressionEval::evaluate(const std::string& expr)
 
     try
     {
-        double result = parseExpression();
+        const double result = parseExpression();
 
         // Check for trailing characters
         while (m_pos < m_expr.size() && std::isspace(static_cast<unsigned char>(m_expr[m_pos])))
@@ -79,13 +79,13 @@ double ExpressionEval::parseExpression()
             break;
         }
 
-        char op = m_expr[m_pos];
+        const char op = m_expr[m_pos];
         if (op != '+' && op != '-')
         {
             break;
         }
         ++m_pos;
-        double right = parseTerm();
+        const double right = parseTerm();
 
         if (op == '+')
         {
@@ -115,13 +115,13 @@ double ExpressionEval::parseTerm()
             break;
         }
 
-        char op = m_expr[m_pos];
+        const char op = m_expr[m_pos];
         if (op != '*' && op != '/')
         {
             break;
         }
         ++m_pos;
-        double right = parseUnary();
+        const double right = parseUnary();
 
         if (op == '*')
         {
@@ -189,7 +189,7 @@ double ExpressionEval::parsePrimary()
     // Number
     if (std::isdigit(static_cast<unsigned char>(m_expr[m_pos])) || m_expr[m_pos] == '.')
     {
-        std::size_t start = m_pos;
+        const std::size_t start = m_pos;
         while (m_pos < m_expr.size() &&
                (std::isdigit(static_cast<unsigned char>(m_expr[m_pos])) || m_expr[m_pos] == '.' ||
                 m_expr[m_pos] == 'e' || m_expr[m_pos] == 'E'))
@@ -208,13 +208,13 @@ double ExpressionEval::parsePrimary()
     // Identifier (function or variable)
     if (std::isalpha(static_cast<unsigned char>(m_expr[m_pos])) || m_expr[m_pos] == '_')
     {
-        std::size_t start = m_pos;
+        const std::size_t start = m_pos;
         while (m_pos < m_expr.size() &&
                (std::isalnum(static_cast<unsigned char>(m_expr[m_pos])) || m_expr[m_pos] == '_'))
         {
             ++m_pos;
         }
-        std::string name = m_expr.substr(start, m_pos - start);
+        const std::string name = m_expr.substr(start, m_pos - start);
 
         // Skip whitespace
         while (m_pos < m_expr.size() && std::isspace(static_cast<unsigned char>(m_expr[m_pos])))
@@ -226,7 +226,7 @@ double ExpressionEval::parsePrimary()
         if (m_pos < m_expr.size() && m_expr[m_pos] == '(')
         {
             ++m_pos;
-            double arg = parseExpression();
+            const double arg = parseExpression();
             while (m_pos < m_expr.size() && std::isspace(static_cast<unsigned char>(m_expr[m_pos])))
             {
                 ++m_pos;
@@ -244,7 +244,7 @@ double ExpressionEval::parsePrimary()
         if (name == "e") return std::numbers::e;
 
         // Variable lookup
-        auto it = m_variables.find(name);
+        const auto it = m_variables.find(name);
         if (it != m_variables.end())
         {
             return it->second;
@@ -257,7 +257,7 @@ double ExpressionEval::parsePrimary()
                                           m_expr[m_pos], m_pos));
 }
 
-double ExpressionEval::callFunction(const std::string& name, double arg)
+double ExpressionEval::callFunction(const std::string& name, const double arg)
 {
     if (name == "abs") return std::abs(arg);
     if (name == "sqrt") return std::sqrt(arg);

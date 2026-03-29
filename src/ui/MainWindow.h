@@ -47,7 +47,8 @@ namespace embview::ui
         void renderMenuBar();
         void renderDockSpace();
         void renderStatusBar();
-        void buildDefaultLayout(unsigned int dockspaceId);
+
+        static void buildDefaultLayout(unsigned int dockspaceId);
 
         std::shared_ptr<core::DataStore> m_dataStore;
         std::shared_ptr<core::DeviceManager> m_deviceMgr;

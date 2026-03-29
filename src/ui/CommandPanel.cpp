@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <charconv>
 #include <format>
+#include <ranges>
 
 using namespace embview::ui;
 using namespace embview::core;
@@ -72,7 +73,7 @@ void CommandPanel::render(bool& open)
         return;
     }
 
-    auto deviceNames = m_deviceMgr->getDeviceNames();
+    const auto deviceNames = m_deviceMgr->getDeviceNames();
 
     if (deviceNames.empty())
     {
@@ -91,7 +92,7 @@ void CommandPanel::render(bool& open)
     {
         for (int i = 0; i < static_cast<int>(deviceNames.size()); ++i)
         {
-            bool selected = (m_selectedDevice == i);
+            const bool selected = (m_selectedDevice == i);
             if (ImGui::Selectable(deviceNames[i].c_str(), selected))
             {
                 m_selectedDevice = i;
@@ -115,8 +116,7 @@ void CommandPanel::render(bool& open)
     {
         ImGui::Combo("Line Ending", &m_lineEnding, "\\r\\n (Windows)\0\\n (Unix)\0\\r (Mac)\0None\0");
 
-        bool enterPressed = ImGui::InputText("##rawinput", m_textInput, sizeof(m_textInput),
-                                              ImGuiInputTextFlags_EnterReturnsTrue);
+        const bool enterPressed = ImGui::InputText("##rawinput", m_textInput, sizeof(m_textInput), ImGuiInputTextFlags_EnterReturnsTrue);
 
         ImGui::SameLine();
         if (ImGui::Button("Send") || enterPressed)
@@ -147,8 +147,7 @@ void CommandPanel::render(bool& open)
     }
     else if (m_sendMode == 1) // Hex Bytes
     {
-        bool enterPressed = ImGui::InputText("##hexinput", m_textInput, sizeof(m_textInput),
-                                              ImGuiInputTextFlags_EnterReturnsTrue);
+        const bool enterPressed = ImGui::InputText("##hexinput", m_textInput, sizeof(m_textInput), ImGuiInputTextFlags_EnterReturnsTrue);
         if (ImGui::IsItemHovered())
         {
             ImGui::SetTooltip("Hex bytes separated by spaces, e.g.: AA 0B FF 01\n"
@@ -182,7 +181,7 @@ void CommandPanel::render(bool& open)
 
         if (ImGui::Button("Send"))
         {
-            DataFrame frame;
+            DataFrame frame{};
             frame.channel = static_cast<uint16_t>(m_channel);
             frame.timestamp = 0.0;
             frame.value = m_value;
@@ -204,9 +203,9 @@ void CommandPanel::render(bool& open)
 
     if (ImGui::BeginChild("CmdHistory", ImVec2(0, 0), ImGuiChildFlags_None, ImGuiWindowFlags_HorizontalScrollbar))
     {
-        for (auto it = m_history.rbegin(); it != m_history.rend(); ++it)
+        for (auto & it : std::ranges::reverse_view(m_history))
         {
-            ImGui::TextWrapped("[%s] %s", it->device.c_str(), it->text.c_str());
+            ImGui::TextWrapped("[%s] %s", it.device.c_str(), it.text.c_str());
         }
     }
     ImGui::EndChild();

@@ -21,7 +21,7 @@ std::optional<DataFrame> Protocol::parseNext()
             continue;
         }
 
-        uint8_t length = m_buffer[1];
+        const uint8_t length = m_buffer[1];
         // Length should be CHANNEL(1) + PAYLOAD(8) = 9
         if (length != 1 + PAYLOAD_SIZE)
         {
@@ -30,9 +30,9 @@ std::optional<DataFrame> Protocol::parseNext()
         }
 
         // Verify CRC over bytes [1..FRAME_SIZE-2] (LENGTH + CHANNEL + PAYLOAD)
-        std::span<const uint8_t> crcRegion(m_buffer.data() + 1, FRAME_SIZE - 2);
-        uint8_t expectedCrc = crc8(crcRegion);
-        uint8_t receivedCrc = m_buffer[FRAME_SIZE - 1];
+        const std::span<const uint8_t> crcRegion(m_buffer.data() + 1, FRAME_SIZE - 2);
+        const uint8_t expectedCrc = crc8(crcRegion);
+        const uint8_t receivedCrc = m_buffer[FRAME_SIZE - 1];
 
         if (expectedCrc != receivedCrc)
         {
@@ -40,7 +40,7 @@ std::optional<DataFrame> Protocol::parseNext()
             continue;
         }
 
-        DataFrame frame;
+        DataFrame frame{};
         frame.channel = m_buffer[2];
         frame.timestamp = m_timestampCounter;
         m_timestampCounter += 1.0;
@@ -54,10 +54,10 @@ std::optional<DataFrame> Protocol::parseNext()
     return std::nullopt;
 }
 
-uint8_t Protocol::crc8(std::span<const uint8_t> data)
+uint8_t Protocol::crc8(const std::span<const uint8_t> data)
 {
     uint8_t crc = 0x00;
-    for (uint8_t byte : data)
+    for (const uint8_t byte : data)
     {
         crc ^= byte;
         for (int i = 0; i < 8; ++i)
@@ -82,7 +82,7 @@ std::vector<uint8_t> Protocol::encode(const DataFrame& frame)
 
     result.push_back(START_BYTE);
 
-    uint8_t length = static_cast<uint8_t>(1 + PAYLOAD_SIZE);
+    constexpr auto length = static_cast<uint8_t>(1 + PAYLOAD_SIZE);
     result.push_back(length);
     result.push_back(static_cast<uint8_t>(frame.channel));
 
@@ -91,7 +91,7 @@ std::vector<uint8_t> Protocol::encode(const DataFrame& frame)
     result.insert(result.end(), valueBytes.begin(), valueBytes.end());
 
     // CRC over [LENGTH, CHANNEL, PAYLOAD]
-    std::span<const uint8_t> crcRegion(result.data() + 1, result.size() - 1);
+    const std::span<const uint8_t> crcRegion(result.data() + 1, result.size() - 1);
     result.push_back(crc8(crcRegion));
 
     return result;

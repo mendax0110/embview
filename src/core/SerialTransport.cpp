@@ -81,7 +81,7 @@ bool SerialTransport::isOpen() const
     return m_isOpen;
 }
 
-std::vector<uint8_t> SerialTransport::read(std::size_t maxBytes)
+std::vector<uint8_t> SerialTransport::read(const std::size_t maxBytes)
 {
     if (!m_isOpen || !m_port)
     {
@@ -89,7 +89,7 @@ std::vector<uint8_t> SerialTransport::read(std::size_t maxBytes)
     }
 
     std::vector<uint8_t> buffer(maxBytes);
-    int bytesRead = sp_nonblocking_read(m_port.get(), buffer.data(), static_cast<int>(maxBytes));
+    const int bytesRead = sp_nonblocking_read(m_port.get(), buffer.data(), static_cast<int>(maxBytes));
 
     if (bytesRead < 0)
     {
@@ -101,14 +101,14 @@ std::vector<uint8_t> SerialTransport::read(std::size_t maxBytes)
     return buffer;
 }
 
-std::size_t SerialTransport::write(std::span<const uint8_t> data)
+std::size_t SerialTransport::write(const std::span<const uint8_t> data)
 {
     if (!m_isOpen || !m_port)
     {
         return 0;
     }
 
-    int bytesWritten = sp_nonblocking_write(m_port.get(), data.data(), static_cast<int>(data.size()));
+    const int bytesWritten = sp_nonblocking_write(m_port.get(), data.data(), static_cast<int>(data.size()));
 
     if (bytesWritten < 0)
     {

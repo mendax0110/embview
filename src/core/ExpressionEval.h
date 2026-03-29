@@ -34,7 +34,8 @@ namespace embview::core
         double parseTerm();
         double parseUnary();
         double parsePrimary();
-        double callFunction(const std::string& name, double arg);
+
+        static double callFunction(const std::string& name, double arg);
 
         std::unordered_map<std::string, double> m_variables;
         std::string m_expr;

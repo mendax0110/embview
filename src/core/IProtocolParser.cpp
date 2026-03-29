@@ -85,7 +85,7 @@ static bool scanDouble(std::string_view sv, double& outValue, std::string_view& 
     std::size_t startIdx = 0;
     while (startIdx < sv.size())
     {
-        char c = sv[startIdx];
+        const char c = sv[startIdx];
         if (std::isdigit(static_cast<unsigned char>(c)) || c == '.' || c == '-' || c == '+')
         {
             break;
@@ -98,7 +98,7 @@ static bool scanDouble(std::string_view sv, double& outValue, std::string_view& 
         return false;
     }
 
-    std::string_view numView = sv.substr(startIdx);
+    const std::string_view numView = sv.substr(startIdx);
     auto [ptr, ec] = std::from_chars(numView.data(), numView.data() + numView.size(), outValue);
     if (ec != std::errc())
     {
@@ -111,7 +111,7 @@ static bool scanDouble(std::string_view sv, double& outValue, std::string_view& 
 
 // --- AsciiLineParser ---
 
-void AsciiLineParser::feedData(std::span<const uint8_t> data)
+void AsciiLineParser::feedData(const std::span<const uint8_t> data)
 {
     m_buffer.append(reinterpret_cast<const char*>(data.data()), data.size());
 }
@@ -137,11 +137,11 @@ std::optional<DataFrame> AsciiLineParser::parseNext()
         m_timestampCounter += 1.0;
 
         // Try "key:value" or "channel:value" format (split on first ':')
-        auto colonPos = trimmedLine.find(':');
+        const auto colonPos = trimmedLine.find(':');
         if (colonPos != std::string_view::npos)
         {
             std::string_view keyPart = trim(trimmedLine.substr(0, colonPos));
-            std::string_view valuePart = trim(trimmedLine.substr(colonPos + 1));
+            const std::string_view valuePart = trim(trimmedLine.substr(colonPos + 1));
 
             // Try parsing key as channel number
             uint16_t ch = 0;
@@ -165,11 +165,11 @@ std::optional<DataFrame> AsciiLineParser::parseNext()
         else
         {
             // No colon -- try "key=value" format
-            auto eqPos = trimmedLine.find('=');
+            const auto eqPos = trimmedLine.find('=');
             if (eqPos != std::string_view::npos)
             {
                 std::string_view keyPart = trim(trimmedLine.substr(0, eqPos));
-                std::string_view valuePart = trim(trimmedLine.substr(eqPos + 1));
+                const std::string_view valuePart = trim(trimmedLine.substr(eqPos + 1));
 
                 uint16_t ch = 0;
                 auto [ptr, ec] = std::from_chars(keyPart.data(), keyPart.data() + keyPart.size(), ch);
@@ -209,7 +209,7 @@ std::optional<DataFrame> AsciiLineParser::parseNext()
 
 // --- AsciiCsvParser ---
 
-void AsciiCsvParser::feedData(std::span<const uint8_t> data)
+void AsciiCsvParser::feedData(const std::span<const uint8_t> data)
 {
     m_buffer.append(reinterpret_cast<const char*>(data.data()), data.size());
 }
@@ -238,7 +238,7 @@ std::optional<DataFrame> AsciiCsvParser::parseNext()
             continue;
         }
 
-        double ts = m_timestampCounter;
+        const double ts = m_timestampCounter;
         m_timestampCounter += 1.0;
 
         // Parse comma-separated or semicolon/tab-separated values
@@ -248,10 +248,10 @@ std::optional<DataFrame> AsciiCsvParser::parseNext()
         while (start < lineStr.size())
         {
             // Find next separator (comma, semicolon, or tab)
-            auto sepPos = lineStr.find_first_of(",;\t", start);
-            std::size_t end = (sepPos == std::string::npos) ? lineStr.size() : sepPos;
+            const auto sepPos = lineStr.find_first_of(",;\t", start);
+            const std::size_t end = (sepPos == std::string::npos) ? lineStr.size() : sepPos;
 
-            std::string_view token = trim(std::string_view(lineStr).substr(start, end - start));
+            const std::string_view token = trim(std::string_view(lineStr).substr(start, end - start));
 
             double val = 0.0;
             std::string_view remainder;

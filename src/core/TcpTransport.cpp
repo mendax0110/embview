@@ -70,7 +70,7 @@ bool TcpTransport::isOpen() const
     return m_isOpen;
 }
 
-std::vector<uint8_t> TcpTransport::read(std::size_t maxBytes)
+std::vector<uint8_t> TcpTransport::read(const std::size_t maxBytes)
 {
     if (!m_isOpen)
     {
@@ -78,7 +78,7 @@ std::vector<uint8_t> TcpTransport::read(std::size_t maxBytes)
     }
 
     std::vector<uint8_t> buffer(maxBytes);
-    int result = m_socket.recv(buffer.data(), maxBytes);
+    const int result = m_socket.recv(buffer.data(), maxBytes);
 
     if (result == -1) // Would block
     {
@@ -100,7 +100,7 @@ std::vector<uint8_t> TcpTransport::read(std::size_t maxBytes)
     return buffer;
 }
 
-std::size_t TcpTransport::write(std::span<const uint8_t> data)
+std::size_t TcpTransport::write(const std::span<const uint8_t> data)
 {
     if (!m_isOpen)
     {

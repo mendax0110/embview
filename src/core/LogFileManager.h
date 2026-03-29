@@ -31,10 +31,10 @@ namespace embview::core
         std::vector<std::filesystem::path> listLogs() const;
 
         /// @brief Delete a specific log file.
-        void deleteLog(const std::filesystem::path& path);
+        void deleteLog(const std::filesystem::path& path) const;
 
         /// @brief Delete all log files older than the given age.
-        void deleteOlderThan(std::chrono::hours maxAge);
+        void deleteOlderThan(std::chrono::hours maxAge) const;
 
     private:
         std::filesystem::path m_logDir;

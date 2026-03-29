@@ -9,9 +9,9 @@ class ProtocolTest : public ::testing::Test
 protected:
     Protocol protocol;
 
-    std::vector<uint8_t> makeValidFrame(uint8_t channel, double value)
+    static std::vector<uint8_t> makeValidFrame(const uint8_t channel, const double value)
     {
-        DataFrame frame;
+        DataFrame frame{};
         frame.channel = channel;
         frame.timestamp = 0.0;
         frame.value = value;
@@ -24,7 +24,7 @@ TEST_F(ProtocolTest, ParseValidFrame)
     auto encoded = makeValidFrame(1, 42.0);
     protocol.feedData(encoded);
 
-    auto result = protocol.parseNext();
+    const auto result = protocol.parseNext();
     ASSERT_TRUE(result.has_value());
     EXPECT_EQ(result->channel, 1);
     EXPECT_DOUBLE_EQ(result->value, 42.0);
@@ -73,7 +73,7 @@ TEST_F(ProtocolTest, SkipsGarbageBeforeValidFrame)
 
     protocol.feedData(data);
 
-    auto result = protocol.parseNext();
+    const auto result = protocol.parseNext();
     ASSERT_TRUE(result.has_value());
     EXPECT_EQ(result->channel, 5);
     EXPECT_DOUBLE_EQ(result->value, 99.9);
@@ -87,7 +87,7 @@ TEST_F(ProtocolTest, RejectsCorruptedCRC)
 
     protocol.feedData(encoded);
 
-    auto result = protocol.parseNext();
+    const auto result = protocol.parseNext();
     EXPECT_FALSE(result.has_value());
 }
 
@@ -99,7 +99,7 @@ TEST_F(ProtocolTest, RejectsInvalidLength)
 
     protocol.feedData(encoded);
 
-    auto result = protocol.parseNext();
+    const auto result = protocol.parseNext();
     EXPECT_FALSE(result.has_value());
 }
 
@@ -127,21 +127,21 @@ TEST_F(ProtocolTest, PartialFrameWaitsForMore)
 TEST_F(ProtocolTest, CRC8Deterministic)
 {
     std::vector<uint8_t> data = {0x01, 0x02, 0x03};
-    uint8_t crc1 = Protocol::crc8(data);
-    uint8_t crc2 = Protocol::crc8(data);
+    const uint8_t crc1 = Protocol::crc8(data);
+    const uint8_t crc2 = Protocol::crc8(data);
     EXPECT_EQ(crc1, crc2);
 }
 
 TEST_F(ProtocolTest, CRC8EmptyInput)
 {
     std::vector<uint8_t> empty;
-    uint8_t crc = Protocol::crc8(empty);
+    const uint8_t crc = Protocol::crc8(empty);
     EXPECT_EQ(crc, 0x00);
 }
 
 TEST_F(ProtocolTest, EncodeDecodeRoundtrip)
 {
-    DataFrame original;
+    DataFrame original{};
     original.channel = 7;
     original.timestamp = 0.0;
     original.value = -123.456;
@@ -150,7 +150,7 @@ TEST_F(ProtocolTest, EncodeDecodeRoundtrip)
     EXPECT_EQ(encoded.size(), Protocol::FRAME_SIZE);
 
     protocol.feedData(encoded);
-    auto decoded = protocol.parseNext();
+    const auto decoded = protocol.parseNext();
 
     ASSERT_TRUE(decoded.has_value());
     EXPECT_EQ(decoded->channel, original.channel);
@@ -165,8 +165,8 @@ TEST_F(ProtocolTest, TimestampIncrementsPerFrame)
     protocol.feedData(f1);
     protocol.feedData(f2);
 
-    auto r1 = protocol.parseNext();
-    auto r2 = protocol.parseNext();
+    const auto r1 = protocol.parseNext();
+    const auto r2 = protocol.parseNext();
 
     ASSERT_TRUE(r1.has_value());
     ASSERT_TRUE(r2.has_value());

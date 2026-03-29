@@ -8,25 +8,25 @@ using namespace embview::core;
 
 TEST(TransportFactoryTest, HasSerialType)
 {
-    auto& factory = TransportFactory::instance();
+    const auto& factory = TransportFactory::instance();
     EXPECT_TRUE(factory.hasType("serial"));
 }
 
 TEST(TransportFactoryTest, UnknownTypeThrows)
 {
-    auto& factory = TransportFactory::instance();
-    nlohmann::json config;
+    const auto& factory = TransportFactory::instance();
+    const nlohmann::json config;
     EXPECT_THROW(factory.create("nonexistent", config), std::runtime_error);
 }
 
 TEST(TransportFactoryTest, CreateSerialReturnsNonNull)
 {
-    auto& factory = TransportFactory::instance();
+    const auto& factory = TransportFactory::instance();
     nlohmann::json config;
     config["port"] = "COM_INVALID_TEST";
     config["baud"] = 9600;
 
-    auto transport = factory.create("serial", config);
+    const auto transport = factory.create("serial", config);
     EXPECT_NE(transport, nullptr);
 }
 

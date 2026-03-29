@@ -21,8 +21,7 @@ Application::~Application()
     shutdown();
 }
 
-bool Application::init(std::shared_ptr<core::LogFileManager> logFileMgr,
-                       const std::string& title, int width, int height)
+bool Application::init(std::shared_ptr<core::LogFileManager> logFileMgr, const std::string& title, const int width, const int height)
 {
     if (!glfwInit())
     {
@@ -160,7 +159,7 @@ void Application::applyDpiScale(float scale)
     }
     m_currentDpiScale = scale;
 
-    ImGuiIO& io = ImGui::GetIO();
+    const ImGuiIO& io = ImGui::GetIO();
     io.Fonts->Clear();
 
     ImFontConfig fontCfg;

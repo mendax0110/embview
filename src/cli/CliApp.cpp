@@ -99,7 +99,7 @@ int CliApp::run(const std::vector<std::string>& args)
     }
 
     core::Protocol protocol;
-    auto startTime = std::chrono::steady_clock::now();
+    const auto startTime = std::chrono::steady_clock::now();
 
     std::cout << "Listening on " << port << " at " << baud << " baud...\n";
 
@@ -110,7 +110,7 @@ int CliApp::run(const std::vector<std::string>& args)
             if (duration > 0.0)
             {
                 auto elapsed = std::chrono::steady_clock::now() - startTime;
-                auto seconds = std::chrono::duration<double>(elapsed).count();
+                const auto seconds = std::chrono::duration<double>(elapsed).count();
                 if (seconds >= duration)
                 {
                     break;
@@ -156,7 +156,7 @@ int CliApp::run(const std::vector<std::string>& args)
     return 0;
 }
 
-void CliApp::printUsage() const
+void CliApp::printUsage()
 {
     std::cout <<
         "embview CLI mode\n"

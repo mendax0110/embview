@@ -24,8 +24,7 @@ DeviceManager::~DeviceManager()
     DIAG_UNREGISTER_MUTEX("DeviceManager::m_mutex");
 }
 
-void DeviceManager::addDevice(std::string name, std::shared_ptr<ITransport> transport,
-                               ProtocolMode protocolMode)
+void DeviceManager::addDevice(std::string name, std::shared_ptr<ITransport> transport, const ProtocolMode protocolMode)
 {
     std::unique_lock lock(m_mutex);
 
@@ -58,7 +57,7 @@ void DeviceManager::addDevice(std::string name, std::shared_ptr<ITransport> tran
     }
 
     auto& ref = *session;
-    session->readerThread = std::jthread([this, &ref](std::stop_token st)
+    session->readerThread = std::jthread([this, &ref](const std::stop_token& st)
     {
         readerLoop(ref, st);
     });
@@ -71,8 +70,10 @@ void DeviceManager::removeDevice(const std::string& name)
 {
     std::unique_lock lock(m_mutex);
 
-    auto it = std::find_if(m_sessions.begin(), m_sessions.end(),
-                           [&name](const auto& s) { return s->name == name; });
+    const auto it = std::ranges::find_if(m_sessions, [&name](const auto& s)
+    {
+        return s->name == name;
+    });
 
     if (it == m_sessions.end())
     {
@@ -94,7 +95,7 @@ void DeviceManager::removeAll()
 {
     std::unique_lock lock(m_mutex);
 
-    for (auto& session : m_sessions)
+    for (const auto& session : m_sessions)
     {
         session->readerThread.request_stop();
     }
@@ -137,7 +138,7 @@ std::size_t DeviceManager::deviceCount() const
     return m_sessions.size();
 }
 
-void DeviceManager::sendCommand(const std::string& deviceName, const DataFrame& frame)
+void DeviceManager::sendCommand(const std::string& deviceName, const DataFrame& frame) const
 {
     std::shared_lock lock(m_mutex);
     for (const auto& session : m_sessions)
@@ -160,7 +161,7 @@ void DeviceManager::sendCommand(const std::string& deviceName, const DataFrame& 
     spdlog::warn("Cannot send to '{}': device not found or not connected", deviceName);
 }
 
-void DeviceManager::sendRaw(const std::string& deviceName, std::span<const uint8_t> data)
+void DeviceManager::sendRaw(const std::string& deviceName, const std::span<const uint8_t> data) const
 {
     std::shared_lock lock(m_mutex);
     for (const auto& session : m_sessions)
@@ -187,7 +188,7 @@ std::shared_ptr<RawDataBuffer> DeviceManager::getRawDataBuffer() const
     return m_rawDataBuffer;
 }
 
-void DeviceManager::readerLoop(DeviceSession& session, std::stop_token stopToken)
+void DeviceManager::readerLoop(DeviceSession& session, const std::stop_token& stopToken) const
 {
     spdlog::info("Reader thread started for '{}'", session.name);
 
