@@ -1,6 +1,9 @@
 #pragma once
 
+#include <functional>
 #include <memory>
+
+#include "AppTheme.h"
 
 namespace embview::core
 {
@@ -36,11 +39,12 @@ namespace embview::ui
     public:
         MainWindow(std::shared_ptr<core::DataStore> dataStore,
                    std::shared_ptr<core::DeviceManager> deviceMgr,
-                   std::shared_ptr<core::LogFileManager> logFileMgr);
+                   std::shared_ptr<core::LogFileManager> logFileMgr,
+                   std::function<void(ColorMode)> setUiMode);
         ~MainWindow();
 
         void render();
-        bool shouldClose() const;
+        [[nodiscard]] bool shouldClose() const;
         void requestLayoutRebuild();
 
     private:
@@ -68,6 +72,7 @@ namespace embview::ui
         std::unique_ptr<RecorderPanel> m_recorderPanel;
         std::unique_ptr<TriggerPanel> m_triggerPanel;
         std::unique_ptr<FftPanel> m_fftPanel;
+        std::function<void(ColorMode)> m_setUiMode;
 
         bool m_showConnectionPanel = true;
         bool m_showPlotPanel = true;
@@ -83,6 +88,7 @@ namespace embview::ui
         bool m_shouldClose = false;
         bool m_needsLayoutRebuild = true;
         bool m_autoScaleLayout = true;
+        bool m_showColorModePanel = true;
         float m_lastLayoutWidth = 0.0f;
         float m_lastLayoutHeight = 0.0f;
 

@@ -35,6 +35,7 @@ endif()
 add_library(embview_ui STATIC
     ui/Application.cpp
     ui/MainWindow.cpp
+    ui/AppTheme.cpp
     ui/ConnectionPanel.cpp
     ui/PlotPanel.cpp
     ui/LogPanel.cpp

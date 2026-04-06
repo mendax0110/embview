@@ -1,7 +1,9 @@
 #pragma once
 
 #include <memory>
+#include <optional>
 #include <string>
+#include "AppTheme.h"
 
 struct GLFWwindow;
 
@@ -31,11 +33,13 @@ namespace embview::ui
         Application(const Application&) = delete;
         Application& operator=(const Application&) = delete;
 
-        bool init(std::shared_ptr<core::LogFileManager> logFileMgr,
-                  const std::string& title = "embview", int width = 1280, int height = 720);
+        bool init(std::shared_ptr<core::LogFileManager> logFileMgr, const std::string& title = "embview", int width = 1280, int height = 720);
 
         void run();
         void shutdown();
+
+        void setUiMode(ColorMode mode);
+        ColorMode getUiMode() const;
 
     private:
         void applyDpiScale(float scale);
@@ -46,5 +50,7 @@ namespace embview::ui
         std::shared_ptr<core::DeviceManager> m_deviceMgr;
         bool m_initialized = false;
         float m_currentDpiScale = 1.0f;
+        ColorMode m_colorMode = ColorMode::Dark;
+        std::optional<ColorMode> m_pendingColorMode;
     };
 } // namespace embview::ui

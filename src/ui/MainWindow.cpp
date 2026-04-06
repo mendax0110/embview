@@ -28,15 +28,17 @@
 using namespace embview::ui;
 using namespace embview::core;
 
-MainWindow::MainWindow(std::shared_ptr<core::DataStore> dataStore,
-                       std::shared_ptr<core::DeviceManager> deviceMgr,
-                       std::shared_ptr<core::LogFileManager> logFileMgr)
+MainWindow::MainWindow(std::shared_ptr<DataStore> dataStore,
+                       std::shared_ptr<DeviceManager> deviceMgr,
+                       std::shared_ptr<LogFileManager> logFileMgr,
+                       std::function<void(ColorMode)> setUiMode)
     : m_dataStore(std::move(dataStore))
     , m_deviceMgr(std::move(deviceMgr))
     , m_triggerEngine(std::make_shared<TriggerEngine>())
     , m_exprEval(std::make_shared<ExpressionEval>())
     , m_recorder(std::make_shared<SessionRecorder>())
     , m_configMgr(std::make_shared<ConfigManager>())
+    , m_setUiMode(std::move(setUiMode))
 {
     m_configMgr->load();
 
@@ -138,6 +140,28 @@ void MainWindow::renderMenuBar()
             if (ImGui::MenuItem("About"))
             {
                 m_showAboutPopup = true;
+            }
+            ImGui::EndMenu();
+        }
+
+        if (ImGui::BeginMenu("ColorStyle"))
+        {
+            const bool hasCallback = static_cast<bool>(m_setUiMode);
+            if (!hasCallback)
+            {
+                ImGui::BeginDisabled();
+            }
+            if (ImGui::MenuItem("DarkMode"))
+            {
+                m_setUiMode(ColorMode::Dark);
+            }
+            if (ImGui::MenuItem("LightMode"))
+            {
+                m_setUiMode(ColorMode::Light);
+            }
+            if (!hasCallback)
+            {
+                ImGui::EndDisabled();
             }
             ImGui::EndMenu();
         }
@@ -295,7 +319,7 @@ void MainWindow::renderDockSpace()
     ImGui::SetNextWindowSize(ImVec2(dockW, dockH));
     ImGui::SetNextWindowViewport(viewport->ID);
 
-    ImGuiWindowFlags windowFlags =
+    constexpr ImGuiWindowFlags windowFlags =
         ImGuiWindowFlags_NoDocking |
         ImGuiWindowFlags_NoTitleBar |
         ImGuiWindowFlags_NoCollapse |

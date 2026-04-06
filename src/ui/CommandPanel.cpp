@@ -14,7 +14,7 @@
 using namespace embview::ui;
 using namespace embview::core;
 
-CommandPanel::CommandPanel(std::shared_ptr<core::DeviceManager> deviceMgr)
+CommandPanel::CommandPanel(std::shared_ptr<DeviceManager> deviceMgr)
     : m_deviceMgr(std::move(deviceMgr))
 {
 }
@@ -203,9 +203,9 @@ void CommandPanel::render(bool& open)
 
     if (ImGui::BeginChild("CmdHistory", ImVec2(0, 0), ImGuiChildFlags_None, ImGuiWindowFlags_HorizontalScrollbar))
     {
-        for (auto & it : std::ranges::reverse_view(m_history))
+        for (const auto&[device, text] : std::ranges::reverse_view(m_history))
         {
-            ImGui::TextWrapped("[%s] %s", it.device.c_str(), it.text.c_str());
+            ImGui::TextWrapped("[%s] %s", device.c_str(), text.c_str());
         }
     }
     ImGui::EndChild();

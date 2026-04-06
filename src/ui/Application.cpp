@@ -11,6 +11,7 @@
 #include <implot.h>
 #include <GLFW/glfw3.h>
 #include <spdlog/spdlog.h>
+#include <functional>
 
 using namespace embview::ui;
 
@@ -64,7 +65,11 @@ bool Application::init(std::shared_ptr<core::LogFileManager> logFileMgr, const s
     m_dataStore = std::make_shared<core::DataStore>();
     m_deviceMgr = std::make_shared<core::DeviceManager>(m_dataStore);
 
-    m_mainWindow = std::make_unique<MainWindow>(m_dataStore, m_deviceMgr, std::move(logFileMgr));
+    auto setUiMode = [app = std::ref(*this)](const ColorMode mode)
+    {
+        app.get().setUiMode(mode);
+    };
+    m_mainWindow = std::make_unique<MainWindow>(m_dataStore, m_deviceMgr, std::move(logFileMgr), std::move(setUiMode));
 
     m_initialized = true;
     spdlog::info("Application initialized");
@@ -87,6 +92,13 @@ void Application::run()
             {
                 applyDpiScale(xscale);
                 m_mainWindow->requestLayoutRebuild();
+            }
+
+            if (m_pendingColorMode.has_value())
+            {
+                m_colorMode = m_pendingColorMode.value();
+                m_pendingColorMode.reset();
+                applyDpiScale(m_currentDpiScale);
             }
 
             // DeviceManager reader threads handle all transport I/O
@@ -171,52 +183,17 @@ void Application::applyDpiScale(float scale)
 
     ImGui_ImplOpenGL3_DestroyFontsTexture();
 
-    // Reset to ImGui defaults, then apply only colors and scale
-    ImGui::StyleColorsDark();
-    ImGuiStyle& style = ImGui::GetStyle();
-
-    ImVec4* colors = style.Colors;
-    colors[ImGuiCol_WindowBg]             = ImVec4(0.11f, 0.11f, 0.13f, 1.00f);
-    colors[ImGuiCol_ChildBg]              = ImVec4(0.11f, 0.11f, 0.13f, 1.00f);
-    colors[ImGuiCol_PopupBg]              = ImVec4(0.13f, 0.13f, 0.16f, 0.96f);
-    colors[ImGuiCol_Border]               = ImVec4(0.22f, 0.22f, 0.26f, 1.00f);
-    colors[ImGuiCol_FrameBg]              = ImVec4(0.16f, 0.16f, 0.19f, 1.00f);
-    colors[ImGuiCol_FrameBgHovered]       = ImVec4(0.22f, 0.22f, 0.26f, 1.00f);
-    colors[ImGuiCol_FrameBgActive]        = ImVec4(0.28f, 0.28f, 0.33f, 1.00f);
-    colors[ImGuiCol_TitleBg]              = ImVec4(0.09f, 0.09f, 0.11f, 1.00f);
-    colors[ImGuiCol_TitleBgActive]        = ImVec4(0.12f, 0.12f, 0.15f, 1.00f);
-    colors[ImGuiCol_TitleBgCollapsed]     = ImVec4(0.09f, 0.09f, 0.11f, 0.75f);
-    colors[ImGuiCol_MenuBarBg]            = ImVec4(0.12f, 0.12f, 0.15f, 1.00f);
-    colors[ImGuiCol_ScrollbarBg]          = ImVec4(0.11f, 0.11f, 0.13f, 1.00f);
-    colors[ImGuiCol_ScrollbarGrab]        = ImVec4(0.25f, 0.25f, 0.30f, 1.00f);
-    colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.30f, 0.30f, 0.36f, 1.00f);
-    colors[ImGuiCol_ScrollbarGrabActive]  = ImVec4(0.35f, 0.35f, 0.42f, 1.00f);
-    colors[ImGuiCol_CheckMark]            = ImVec4(0.30f, 0.65f, 0.90f, 1.00f);
-    colors[ImGuiCol_SliderGrab]           = ImVec4(0.30f, 0.65f, 0.90f, 1.00f);
-    colors[ImGuiCol_SliderGrabActive]     = ImVec4(0.40f, 0.72f, 0.95f, 1.00f);
-    colors[ImGuiCol_Button]               = ImVec4(0.20f, 0.20f, 0.24f, 1.00f);
-    colors[ImGuiCol_ButtonHovered]        = ImVec4(0.28f, 0.28f, 0.33f, 1.00f);
-    colors[ImGuiCol_ButtonActive]         = ImVec4(0.30f, 0.65f, 0.90f, 0.80f);
-    colors[ImGuiCol_Header]               = ImVec4(0.20f, 0.20f, 0.24f, 1.00f);
-    colors[ImGuiCol_HeaderHovered]        = ImVec4(0.28f, 0.28f, 0.33f, 1.00f);
-    colors[ImGuiCol_HeaderActive]         = ImVec4(0.30f, 0.65f, 0.90f, 0.80f);
-    colors[ImGuiCol_Separator]            = ImVec4(0.22f, 0.22f, 0.26f, 1.00f);
-    colors[ImGuiCol_SeparatorHovered]     = ImVec4(0.30f, 0.65f, 0.90f, 0.60f);
-    colors[ImGuiCol_SeparatorActive]      = ImVec4(0.30f, 0.65f, 0.90f, 1.00f);
-    colors[ImGuiCol_ResizeGrip]           = ImVec4(0.30f, 0.65f, 0.90f, 0.20f);
-    colors[ImGuiCol_ResizeGripHovered]    = ImVec4(0.30f, 0.65f, 0.90f, 0.60f);
-    colors[ImGuiCol_ResizeGripActive]     = ImVec4(0.30f, 0.65f, 0.90f, 1.00f);
-    colors[ImGuiCol_Tab]                  = ImVec4(0.14f, 0.14f, 0.17f, 1.00f);
-    colors[ImGuiCol_TabHovered]           = ImVec4(0.30f, 0.65f, 0.90f, 0.60f);
-    colors[ImGuiCol_TabSelected]          = ImVec4(0.20f, 0.45f, 0.70f, 1.00f);
-    colors[ImGuiCol_TabDimmed]            = ImVec4(0.11f, 0.11f, 0.13f, 1.00f);
-    colors[ImGuiCol_TabDimmedSelected]    = ImVec4(0.18f, 0.35f, 0.55f, 1.00f);
-    colors[ImGuiCol_DockingPreview]       = ImVec4(0.30f, 0.65f, 0.90f, 0.50f);
-    colors[ImGuiCol_DockingEmptyBg]       = ImVec4(0.09f, 0.09f, 0.11f, 1.00f);
-    colors[ImGuiCol_TextSelectedBg]       = ImVec4(0.30f, 0.65f, 0.90f, 0.35f);
-    colors[ImGuiCol_NavHighlight]         = ImVec4(0.30f, 0.65f, 0.90f, 1.00f);
-
-    style.ScaleAllSizes(scale);
+    appTheme::apply(m_colorMode, scale);
 
     spdlog::info("DPI scale applied: {:.2f}", scale);
+}
+
+void Application::setUiMode(const ColorMode mode)
+{
+    m_pendingColorMode = mode;
+}
+
+ColorMode Application::getUiMode() const
+{
+    return m_colorMode;
 }

@@ -31,14 +31,14 @@ PlotPanel::PlotPanel(std::shared_ptr<core::DataStore> dataStore,
 
 PlotPanel::~PlotPanel() = default;
 
-PlotPanel::ChannelConfig& PlotPanel::getConfig(uint16_t channel)
+PlotPanel::ChannelConfig& PlotPanel::getConfig(const uint16_t channel)
 {
-    auto it = m_channelConfigs.find(channel);
+    const auto it = m_channelConfigs.find(channel);
     if (it == m_channelConfigs.end())
     {
         ChannelConfig cfg;
-        uint8_t devIdx = static_cast<uint8_t>(channel / 256);
-        uint8_t rawCh = static_cast<uint8_t>(channel % 256);
+        const auto devIdx = static_cast<uint8_t>(channel / 256);
+        const auto rawCh = static_cast<uint8_t>(channel % 256);
         if (devIdx > 0)
         {
             cfg.name = "D" + std::to_string(devIdx) + "/Ch" + std::to_string(rawCh);

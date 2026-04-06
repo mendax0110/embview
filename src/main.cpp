@@ -12,7 +12,7 @@
 #include <string>
 #include <vector>
 
-int main(int argc, char* argv[])
+int main(const int argc, char* argv[])
 {
     try
     {
@@ -30,9 +30,7 @@ int main(int argc, char* argv[])
         if (cliMode)
         {
             args.erase(std::ranges::remove(args, "--cli").begin(), args.end());
-
-            embview::cli::CliApp cli;
-            result = cli.run(args);
+            result = embview::cli::CliApp::run(args);
         }
         else
         {
