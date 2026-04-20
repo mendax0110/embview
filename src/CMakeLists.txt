@@ -15,6 +15,7 @@ add_library(embview_core STATIC
     core/TriggerEngine.cpp
     core/ExpressionEval.cpp
     core/ConfigManager.cpp
+    core/FileFactory.cpp
 )
 
 target_include_directories(embview_core PUBLIC
@@ -29,6 +30,8 @@ target_link_libraries(embview_core PUBLIC
 
 if(WIN32)
     target_link_libraries(embview_core PUBLIC ws2_32)
+elseif(UNIX AND NOT APPLE)
+    target_link_libraries(embview_core PUBLIC uuid)
 endif()
 
 # --- UI library ---

@@ -2,6 +2,7 @@ add_executable(embview_tests
     test_Protocol.cpp
     test_DataStore.cpp
     test_TransportFactory.cpp
+    test_FileFactory.cpp
 )
 
 target_include_directories(embview_tests PRIVATE

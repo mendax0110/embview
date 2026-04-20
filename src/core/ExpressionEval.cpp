@@ -173,7 +173,7 @@ double ExpressionEval::parsePrimary()
     if (m_expr[m_pos] == '(')
     {
         ++m_pos;
-        double val = parseExpression();
+        const double val = parseExpression();
         while (m_pos < m_expr.size() && std::isspace(static_cast<unsigned char>(m_expr[m_pos])))
         {
             ++m_pos;

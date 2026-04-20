@@ -130,10 +130,10 @@ namespace embview::core
         SocketGuard& operator=(const SocketGuard&) = delete;
 
         /// @brief Returns the native socket handle.
-        NativeHandle get() const { return m_socket; }
+        [[nodiscard]] NativeHandle get() const { return m_socket; }
 
         /// @brief Returns true if the socket is valid (not closed / never opened).
-        bool valid() const { return m_socket != kInvalid; }
+        [[nodiscard]] bool valid() const { return m_socket != kInvalid; }
 
         /// @brief Implicit bool: true when holding a valid socket.
         explicit operator bool() const { return valid(); }
@@ -145,7 +145,7 @@ namespace embview::core
         }
 
         /// @brief Closes the current socket (if valid) and takes ownership of a new one.
-        void reset(NativeHandle newSock = kInvalid)
+        void reset(const NativeHandle newSock = kInvalid)
         {
             if (m_socket != kInvalid)
             {
@@ -159,7 +159,7 @@ namespace embview::core
         }
 
         /// @brief Sets the socket to non-blocking mode.
-        void setNonBlocking()
+        void setNonBlocking() const
         {
             if (m_socket == kInvalid)
             {
@@ -169,14 +169,14 @@ namespace embview::core
             u_long mode = 1;
             ioctlsocket(m_socket, FIONBIO, &mode);
 #else
-            int flags = fcntl(m_socket, F_GETFL, 0);
+            const int flags = fcntl(m_socket, F_GETFL, 0);
             fcntl(m_socket, F_SETFL, flags | O_NONBLOCK);
 #endif
         }
 
         /// @brief Sets a socket option. Wraps setsockopt with platform differences.
         template <typename T>
-        bool setOption(int level, int optName, const T& value)
+        bool setOption(const int level, const int optName, const T& value)
         {
             if (m_socket == kInvalid)
             {
@@ -210,7 +210,7 @@ namespace embview::core
         }
 
         /// @brief Sends data on a connected socket. Returns bytes sent or 0 on error.
-        std::size_t send(const uint8_t* data, std::size_t size)
+        std::size_t send(const uint8_t* data, const std::size_t size) const
         {
 #ifdef _WIN32
             int result = ::send(m_socket, reinterpret_cast<const char*>(data),
@@ -221,7 +221,7 @@ namespace embview::core
             }
             return static_cast<std::size_t>(result);
 #else
-            ssize_t result = ::send(m_socket, data, size, 0);
+            const ssize_t result = ::send(m_socket, data, size, 0);
             if (result < 0)
             {
                 return 0;
@@ -231,7 +231,7 @@ namespace embview::core
         }
 
         /// @brief Receives data from a connected socket. Returns bytes read, 0 on close, -1 on would-block.
-        int recv(uint8_t* buffer, std::size_t maxBytes)
+        int recv(uint8_t* buffer, const std::size_t maxBytes) const
         {
 #ifdef _WIN32
             int result = ::recv(m_socket, reinterpret_cast<char*>(buffer),
@@ -242,7 +242,7 @@ namespace embview::core
             }
             return result;
 #else
-            ssize_t result = ::recv(m_socket, buffer, maxBytes, 0);
+            const ssize_t result = ::recv(m_socket, buffer, maxBytes, 0);
             if (result < 0)
             {
                 return (errno == EAGAIN || errno == EWOULDBLOCK) ? -1 : -2;
@@ -252,7 +252,7 @@ namespace embview::core
         }
 
         /// @brief Receives a datagram. Returns bytes read, -1 on would-block, -2 on error.
-        int recvFrom(uint8_t* buffer, std::size_t maxBytes)
+        int recvFrom(uint8_t* buffer, const std::size_t maxBytes) const
         {
 #ifdef _WIN32
             int result = ::recvfrom(m_socket, reinterpret_cast<char*>(buffer),
@@ -263,7 +263,7 @@ namespace embview::core
             }
             return result;
 #else
-            ssize_t result = ::recvfrom(m_socket, buffer, maxBytes, 0, nullptr, nullptr);
+            const ssize_t result = ::recvfrom(m_socket, buffer, maxBytes, 0, nullptr, nullptr);
             if (result < 0)
             {
                 return (errno == EAGAIN || errno == EWOULDBLOCK) ? -1 : -2;
@@ -273,7 +273,7 @@ namespace embview::core
         }
 
         /// @brief Binds the socket to an address.
-        bool bind(const sockaddr_in& addr)
+        [[nodiscard]] bool bind(const sockaddr_in& addr) const
         {
             if (m_socket == kInvalid)
             {
@@ -283,13 +283,12 @@ namespace embview::core
             return ::bind(m_socket, reinterpret_cast<const sockaddr*>(&addr),
                           sizeof(addr)) != SOCKET_ERROR;
 #else
-            return ::bind(m_socket, reinterpret_cast<const sockaddr*>(&addr),
-                          sizeof(addr)) == 0;
+            return ::bind(m_socket, reinterpret_cast<const sockaddr*>(&addr), sizeof(addr)) == 0;
 #endif
         }
 
         /// @brief Non-blocking connect with timeout. Returns true if connected.
-        bool connectWithTimeout(const sockaddr_in& addr, int timeoutSec)
+        bool connectWithTimeout(const sockaddr_in& addr, const int timeoutSec)
         {
             if (m_socket == kInvalid)
             {
@@ -338,9 +337,7 @@ namespace embview::core
                 }
             }
 #else
-            int connectResult = ::connect(m_socket,
-                                           reinterpret_cast<const sockaddr*>(&addr),
-                                           sizeof(addr));
+            const int connectResult = ::connect(m_socket, reinterpret_cast<const sockaddr*>(&addr),sizeof(addr));
 
             if (connectResult < 0)
             {

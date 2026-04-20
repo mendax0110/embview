@@ -32,7 +32,7 @@ namespace embview::core
 
         virtual std::optional<DataFrame> parseNext() = 0;
 
-        virtual ProtocolMode mode() const = 0;
+        [[nodiscard]] virtual ProtocolMode mode() const = 0;
     };
 
     /**
@@ -41,7 +41,7 @@ namespace embview::core
     class BinaryProtocolParser : public IProtocolParser
     {
     public:
-        void feedData(std::span<const uint8_t> data) override
+        void feedData(const std::span<const uint8_t> data) override
         {
             m_protocol.feedData(data);
         }
@@ -51,7 +51,7 @@ namespace embview::core
             return m_protocol.parseNext();
         }
 
-        ProtocolMode mode() const override { return ProtocolMode::Binary; }
+        [[nodiscard]] ProtocolMode mode() const override { return ProtocolMode::Binary; }
 
     private:
         Protocol m_protocol;
@@ -72,7 +72,7 @@ namespace embview::core
 
         std::optional<DataFrame> parseNext() override;
 
-        ProtocolMode mode() const override { return ProtocolMode::AsciiLine; }
+        [[nodiscard]] ProtocolMode mode() const override { return ProtocolMode::AsciiLine; }
 
     private:
         std::string m_buffer;
@@ -92,7 +92,7 @@ namespace embview::core
 
         std::optional<DataFrame> parseNext() override;
 
-        ProtocolMode mode() const override { return ProtocolMode::AsciiCsv; }
+        [[nodiscard]] ProtocolMode mode() const override { return ProtocolMode::AsciiCsv; }
 
     private:
         std::string m_buffer;

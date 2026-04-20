@@ -1,7 +1,6 @@
 #include "core/SessionRecorder.h"
-
+#include "core/FileFactory.h"
 #include <spdlog/spdlog.h>
-
 #include <cstring>
 
 using namespace embview::core;
@@ -72,24 +71,43 @@ std::vector<DataFrame> SessionRecorder::loadSession(const std::filesystem::path&
 {
     std::vector<DataFrame> result;
 
-    std::ifstream file(path, std::ios::binary);
-    if (!file.is_open())
+    try
     {
-        spdlog::error("Failed to open session file: {}", path.string());
-        return result;
-    }
+        const auto blob = FileFactory::instance().loadFromFile(path, FileTypeId::binary);
+        const auto& bytes = blob->data();
 
-    while (file.good())
-    {
-        DataFrame frame{};
-        file.read(reinterpret_cast<char*>(&frame.channel), sizeof(frame.channel));
-        file.read(reinterpret_cast<char*>(&frame.timestamp), sizeof(frame.timestamp));
-        file.read(reinterpret_cast<char*>(&frame.value), sizeof(frame.value));
-
-        if (file.gcount() == sizeof(frame.value))
+        constexpr std::size_t frameSize = sizeof(DataFrame::channel) + sizeof(DataFrame::timestamp) + sizeof(DataFrame::value);
+        if (bytes.size() < frameSize)
         {
+            return result;
+        }
+
+        std::size_t offset = 0;
+        while (offset + frameSize <= bytes.size())
+        {
+            DataFrame frame{};
+
+            std::memcpy(&frame.channel, bytes.data() + offset, sizeof(frame.channel));
+            offset += sizeof(frame.channel);
+
+            std::memcpy(&frame.timestamp, bytes.data() + offset, sizeof(frame.timestamp));
+            offset += sizeof(frame.timestamp);
+
+            std::memcpy(&frame.value, bytes.data() + offset, sizeof(frame.value));
+            offset += sizeof(frame.value);
+
             result.push_back(frame);
         }
+
+        if (offset != bytes.size())
+        {
+            spdlog::warn("Session file {} had {} trailing bytes", path.string(), bytes.size() - offset);
+        }
+    }
+    catch (const std::exception& e)
+    {
+        spdlog::error("Failed to open session file {}: {}", path.string(), e.what());
+        return result;
     }
 
     spdlog::info("Loaded session: {} ({} frames)", path.string(), result.size());

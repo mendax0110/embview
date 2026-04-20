@@ -1,8 +1,7 @@
 #include "core/ConfigManager.h"
-
+#include "core/FileFactory.h"
 #include <spdlog/spdlog.h>
-
-#include <fstream>
+#include <vector>
 
 using namespace embview::core;
 
@@ -23,15 +22,9 @@ bool ConfigManager::load()
 
     try
     {
-        std::ifstream file(m_configPath);
-        if (!file.is_open())
-        {
-            spdlog::error("Failed to open config file: {}", m_configPath.string());
-            m_data = nlohmann::json::object();
-            return false;
-        }
-
-        m_data = nlohmann::json::parse(file);
+        const auto blob = FileFactory::instance().loadFromFile(m_configPath, FileTypeId::json);
+        const std::string jsonText(blob->data().begin(), blob->data().end());
+        m_data = nlohmann::json::parse(jsonText);
         spdlog::info("Loaded config from {}", m_configPath.string());
         return true;
     }
@@ -47,20 +40,11 @@ bool ConfigManager::save() const
 {
     try
     {
-        std::ofstream file(m_configPath);
-        if (!file.is_open())
-        {
-            spdlog::error("Failed to write config file: {}", m_configPath.string());
-            return false;
-        }
+        const auto payload = m_data.dump(4);
+        const std::vector<uint8_t> bytes(payload.begin(), payload.end());
 
-        file << m_data.dump(4);
-
-        if (!file.good())
-        {
-            spdlog::error("Write error saving config to {}", m_configPath.string());
-            return false;
-        }
+        const auto blob = FileFactory::instance().create(FileTypeId::json, bytes);
+        FileFactory::saveToFile(*blob, m_configPath);
 
         spdlog::info("Saved config to {}", m_configPath.string());
         return true;

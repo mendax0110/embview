@@ -107,7 +107,7 @@ std::size_t TcpTransport::write(const std::span<const uint8_t> data)
         return 0;
     }
 
-    std::size_t sent = m_socket.send(data.data(), data.size());
+    const std::size_t sent = m_socket.send(data.data(), data.size());
     if (sent == 0)
     {
         spdlog::warn("TCP send error");
