@@ -25,6 +25,10 @@ namespace embview::core
          * @param maxSamplesPerChannel Maximum number of frames per channel before oldest are dropped.
          */
         explicit DataStore(std::size_t maxSamplesPerChannel = 10000);
+
+        /**
+         * @brief Destructor for DataStore, cleans up resources.
+         */
         ~DataStore();
 
         /**
@@ -40,12 +44,28 @@ namespace embview::core
          */
         std::vector<DataFrame> getChannel(uint16_t channel) const;
 
+        /**
+         * @brief Get a list of all channels with stored data.
+         * @return Vector of channel identifiers.
+         */
         std::vector<uint16_t> getActiveChannels() const;
 
+        /**
+         * @brief Get the number of stored frames for a specific channel.
+         * @param channel The channel to check
+         * @return A size_t representing the size of the channel
+         */
         std::size_t getChannelSize(uint16_t channel) const;
 
+        /**
+         * @brief Clear all stored data across all channels.
+         */
         void clear();
 
+        /**
+         * @brief Clear all stored data for a specific channel.
+         * @param channel The channel to clear
+         */
         void clearChannel(uint16_t channel);
 
     private:

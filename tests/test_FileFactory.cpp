@@ -42,7 +42,7 @@ TEST(FileFactoryTest, SaveAndLoadRoundTrip)
 
 TEST(FileFactoryTest, UnknownTypeThrows)
 {
-    auto& factory = FileFactory::instance();
+    const auto& factory = FileFactory::instance();
     EXPECT_THROW(factory.create(static_cast<FileTypeId>(999), {}), std::runtime_error);
 }
 

@@ -31,7 +31,7 @@ namespace embview::core
          * @brief Check whether the transport is currently open.
          * @return true if the connection is active.
          */
-        virtual bool isOpen() const = 0;
+        [[nodiscard]] virtual bool isOpen() const = 0;
 
         /**
         * @brief Read up to @p maxBytes from the transport.

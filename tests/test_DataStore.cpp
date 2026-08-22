@@ -8,16 +8,19 @@
 
 using namespace embview::core;
 
-class DataStoreTest : public ::testing::Test
+namespace
 {
-protected:
-    DataStore store{100}; // small capacity for testing
-
-    static DataFrame makeFrame(const uint8_t channel, const double value, const double timestamp = 0.0)
+    class DataStoreTest : public ::testing::Test
     {
-        return DataFrame{channel, timestamp, value};
-    }
-};
+    protected:
+        DataStore store{100}; // small capacity for testing
+
+        static DataFrame makeFrame(const uint8_t channel, const double value, const double timestamp = 0.0)
+        {
+            return DataFrame{.channel = channel, .timestamp = timestamp, .value = value};
+        }
+    };
+}
 
 TEST_F(DataStoreTest, PushAndGetSingleChannel)
 {

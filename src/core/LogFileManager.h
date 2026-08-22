@@ -25,10 +25,10 @@ namespace embview::core
         void init();
 
         /// @brief Get the path to the currently active log file.
-        std::filesystem::path currentLogPath() const;
+        [[nodiscard]] std::filesystem::path currentLogPath() const;
 
         /// @brief List all .log files in the log directory, sorted newest first.
-        std::vector<std::filesystem::path> listLogs() const;
+        [[nodiscard]] std::vector<std::filesystem::path> listLogs() const;
 
         /// @brief Delete a specific log file.
         void deleteLog(const std::filesystem::path& path) const;

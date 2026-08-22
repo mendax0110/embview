@@ -104,7 +104,7 @@ namespace embview::core
 
         SocketGuard() = default;
 
-        explicit SocketGuard(NativeHandle sock) : m_socket(sock) {}
+        explicit SocketGuard(const NativeHandle sock) : m_socket(sock) {}
 
         ~SocketGuard()
         {
@@ -354,7 +354,7 @@ namespace embview::core
                 timeval tv{};
                 tv.tv_sec = timeoutSec;
 
-                int sel = ::select(m_socket + 1, nullptr, &writeFds, nullptr, &tv);
+                const int sel = ::select(m_socket + 1, nullptr, &writeFds, nullptr, &tv);
                 if (sel <= 0)
                 {
                     return false;

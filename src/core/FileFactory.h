@@ -35,7 +35,7 @@ namespace embview::core
     private:
         std::vector<uint8_t> m_data;
         FileTypeId m_type;
-        uuid_t m_id;
+        uuid_t m_id{};
     };
 
     class FileFactory

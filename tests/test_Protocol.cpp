@@ -4,20 +4,23 @@
 
 using namespace embview::core;
 
-class ProtocolTest : public ::testing::Test
+namespace
 {
-protected:
-    Protocol protocol;
-
-    static std::vector<uint8_t> makeValidFrame(const uint8_t channel, const double value)
+    class ProtocolTest : public ::testing::Test
     {
-        DataFrame frame{};
-        frame.channel = channel;
-        frame.timestamp = 0.0;
-        frame.value = value;
-        return Protocol::encode(frame);
-    }
-};
+    protected:
+        Protocol protocol;
+
+        static std::vector<uint8_t> makeValidFrame(const uint8_t channel, const double value)
+        {
+            DataFrame frame{};
+            frame.channel = channel;
+            frame.timestamp = 0.0;
+            frame.value = value;
+            return Protocol::encode(frame);
+        }
+    };
+}
 
 TEST_F(ProtocolTest, ParseValidFrame)
 {

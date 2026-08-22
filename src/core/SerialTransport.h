@@ -43,7 +43,7 @@ namespace embview::core
 
         bool open() override;
         void close() override;
-        bool isOpen() const override;
+        [[nodiscard]] bool isOpen() const override;
         std::vector<uint8_t> read(std::size_t maxBytes) override;
         std::size_t write(std::span<const uint8_t> data) override;
 
