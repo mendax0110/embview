@@ -4,12 +4,27 @@
 #include <string>
 #include <vector>
 
+/**
+ * @namespace embview::core Core support.
+ */
 namespace embview::core
 {
+    /**
+     * @brief Data Store.
+     * \class DataStore
+     */
     class DataStore;
+
+    /**
+     * @brief Session Recorder.
+     * \class SessionRecorder
+     */
     class SessionRecorder;
 } // namespace embview::core
 
+/**
+ * @namespace embview::ui Ui support.
+ */
 namespace embview::ui
 {
     /**
@@ -18,10 +33,22 @@ namespace embview::ui
     class RecorderPanel
     {
     public:
+        /**
+         * @brief Create a panel for recording and replaying sessions.
+         * @param dataStore Shared data store to record.
+         * @param recorder Session recorder used for disk I/O.
+         */
         RecorderPanel(std::shared_ptr<core::DataStore> dataStore,
                       std::shared_ptr<core::SessionRecorder> recorder);
+        /**
+         * @brief Destroy the recorder panel.
+         */
         ~RecorderPanel();
 
+        /**
+         * @brief Render the recording UI.
+         * @param open Whether the panel is open.
+         */
         void render(bool& open);
 
     private:

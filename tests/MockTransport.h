@@ -18,23 +18,40 @@ namespace embview::testing
     class MockTransport final : public core::ITransport
     {
     public:
+
+        /**
+         * @brief
+         * @return
+         */
         bool open() override
         {
             m_isOpen = true;
             return true;
         }
 
+        /**
+         * @brief
+         */
         void close() override
         {
             m_isOpen = false;
         }
 
+        /**
+         * @brief
+         * @return
+         */
         bool isOpen() const override
         {
             return m_isOpen;
         }
 
-        std::vector<uint8_t> read(std::size_t maxBytes) override
+        /**
+         * @brief
+         * @param maxBytes
+         * @return
+         */
+        std::vector<uint8_t> read(const std::size_t maxBytes) override
         {
             if (m_readData.empty())
             {
@@ -42,7 +59,7 @@ namespace embview::testing
             }
 
             auto& front = m_readData.front();
-            std::size_t count = std::min(maxBytes, front.size());
+            const std::size_t count = std::min(maxBytes, front.size());
             std::vector<uint8_t> result(front.begin(), front.begin() + count);
             front.erase(front.begin(), front.begin() + count);
 
@@ -54,25 +71,38 @@ namespace embview::testing
             return result;
         }
 
+        /**
+         * @brief
+         * @param data
+         * @return
+         */
         std::size_t write(std::span<const uint8_t> data) override
         {
             m_writtenData.insert(m_writtenData.end(), data.begin(), data.end());
             return data.size();
         }
 
-        /// @brief Enqueue data to be returned by subsequent read() calls.
+        /**
+         * @brief Enqueue data to be returned by subsequent read() calls.
+         * @param data
+         */
         void enqueueReadData(std::vector<uint8_t> data)
         {
             m_readData.push(std::move(data));
         }
 
-        /// @brief Get all data written via write().
+        /**
+         * @brief Get all data written via write().
+         * @return
+         */
         const std::vector<uint8_t>& getWrittenData() const
         {
             return m_writtenData;
         }
 
-        /// @brief Clear recorded write data.
+        /**
+         * @brief Clear recorded write data.
+         */
         void clearWrittenData()
         {
             m_writtenData.clear();

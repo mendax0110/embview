@@ -5,8 +5,17 @@
 #include <memory>
 #include <vector>
 
-namespace spdlog { namespace sinks { class sink; } }
+/**
+ * @namespace spdlog::sinks
+ */
+namespace spdlog::sinks
+{
+    class sink;
+}
 
+/**
+ * @namespace embview::core Core support.
+ */
 namespace embview::core
 {
     /**
@@ -18,22 +27,44 @@ namespace embview::core
     class LogFileManager
     {
     public:
+        /**
+         * @brief Create a log manager for the given directory.
+         * @param logDir Directory used for rotating log files.
+         */
         explicit LogFileManager(std::filesystem::path logDir = "logs");
+
+        /**
+         * @brief Destroy the log manager and release the sink.
+         */
         ~LogFileManager();
 
-        /// @brief Create log directory, set up rotating file sink, register on default logger.
+        /**
+         * @brief Initialize the log directory and default logger sink.
+         */
         void init();
 
-        /// @brief Get the path to the currently active log file.
+        /**
+         * @brief Get the current active log file path.
+         * @return Path to the active log file.
+         */
         [[nodiscard]] std::filesystem::path currentLogPath() const;
 
-        /// @brief List all .log files in the log directory, sorted newest first.
+        /**
+         * @brief List all log files in the directory.
+         * @return Log files sorted newest first.
+         */
         [[nodiscard]] std::vector<std::filesystem::path> listLogs() const;
 
-        /// @brief Delete a specific log file.
+        /**
+         * @brief Delete a specific log file.
+         * @param path
+         */
         void deleteLog(const std::filesystem::path& path) const;
 
-        /// @brief Delete all log files older than the given age.
+        /**
+         * @brief Delete all log files older than the given age.
+         * @param maxAge
+         */
         void deleteOlderThan(std::chrono::hours maxAge) const;
 
     private:

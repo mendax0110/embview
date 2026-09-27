@@ -7,9 +7,12 @@
 #include <span>
 #include <string>
 
+/**
+ * @namespace embview::core Core support.
+ */
 namespace embview::core
 {
-    /// @brief Protocol parser mode identifiers.
+    /// @brief Protocol parser mode identifiers. \enum ProtocolMode
     enum class ProtocolMode
     {
         Binary,    ///< Custom binary frame [0xAA][LEN][CH][double][CRC8]
@@ -26,12 +29,27 @@ namespace embview::core
     class IProtocolParser
     {
     public:
+        /**
+        * @brief Destroy the parser.
+         */
         virtual ~IProtocolParser() = default;
 
+        /**
+        * @brief Feed raw bytes into the parser.
+        * @param data Incoming bytes to parse.
+         */
         virtual void feedData(std::span<const uint8_t> data) = 0;
 
+        /**
+        * @brief Parse the next complete frame.
+        * @return The next decoded frame, if available.
+         */
         virtual std::optional<DataFrame> parseNext() = 0;
 
+        /**
+        * @brief Get the active protocol mode.
+        * @return The parser mode.
+         */
         [[nodiscard]] virtual ProtocolMode mode() const = 0;
     };
 
@@ -41,16 +59,28 @@ namespace embview::core
     class BinaryProtocolParser : public IProtocolParser
     {
     public:
+        /**
+        * @brief Feed raw bytes to the wrapped protocol.
+        * @param data Incoming bytes to parse.
+         */
         void feedData(const std::span<const uint8_t> data) override
         {
             m_protocol.feedData(data);
         }
 
+        /**
+        * @brief Parse the next binary frame.
+        * @return The next decoded frame, if available.
+         */
         std::optional<DataFrame> parseNext() override
         {
             return m_protocol.parseNext();
         }
 
+        /**
+        * @brief Get the protocol mode.
+        * @return The binary protocol mode.
+         */
         [[nodiscard]] ProtocolMode mode() const override { return ProtocolMode::Binary; }
 
     private:
@@ -68,10 +98,22 @@ namespace embview::core
     class AsciiLineParser : public IProtocolParser
     {
     public:
+        /**
+         * @brief Feed raw bytes into the ASCII line parser.
+         * @param data Incoming bytes to buffer.
+         */
         void feedData(std::span<const uint8_t> data) override;
 
+        /**
+         * @brief Parse the next ASCII line frame.
+         * @return The next decoded frame, if available.
+         */
         std::optional<DataFrame> parseNext() override;
 
+        /**
+         * @brief Get the parser mode.
+         * @return The ASCII line mode.
+         */
         [[nodiscard]] ProtocolMode mode() const override { return ProtocolMode::AsciiLine; }
 
     private:
@@ -88,10 +130,22 @@ namespace embview::core
     class AsciiCsvParser : public IProtocolParser
     {
     public:
+        /**
+         * @brief Feed raw bytes into the CSV parser.
+         * @param data Incoming bytes to buffer.
+         */
         void feedData(std::span<const uint8_t> data) override;
 
+        /**
+         * @brief Parse the next CSV frame.
+         * @return The next decoded frame, if available.
+         */
         std::optional<DataFrame> parseNext() override;
 
+        /**
+         * @brief Get the parser mode.
+         * @return The CSV mode.
+         */
         [[nodiscard]] ProtocolMode mode() const override { return ProtocolMode::AsciiCsv; }
 
     private:

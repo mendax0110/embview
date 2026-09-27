@@ -12,11 +12,11 @@
 namespace embview::core
 {
     /**
-    * @brief Thread-safe storage for incoming data frames.
-    *
-    * Maintains per-channel ring buffers with configurable maximum capacity.
-    * Supports concurrent reads from the UI thread and writes from the I/O thread.
-    */
+     * @brief Thread-safe storage for incoming data frames.
+     *
+     * Maintains per-channel ring buffers with configurable maximum capacity.
+     * Supports concurrent reads from the UI thread and writes from the I/O thread.
+     */
     class DataStore
     {
     public:

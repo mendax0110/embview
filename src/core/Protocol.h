@@ -6,9 +6,14 @@
 #include <string>
 #include <vector>
 
+/**
+ * @namespace embview::core Core support.
+ */
 namespace embview::core
 {
-    /// @brief A single parsed data frame from a device.
+    /**
+     * @brief A single parsed data frame from a device. \struct DataFrame
+     */
     struct DataFrame
     {
         uint16_t channel;
@@ -17,17 +22,17 @@ namespace embview::core
     };
 
     /**
-    * @brief Frame protocol parser for device communication.
-    *
-    * Wire format: [0xAA][LENGTH][CHANNEL][PAYLOAD (8 bytes: double)][CRC8]
-    * - START_BYTE: 0xAA
-    * - LENGTH: payload size + 1 (channel byte)
-    * - CHANNEL: data channel identifier
-    * - PAYLOAD: 8-byte little-endian double value
-    * - CRC8: CRC over LENGTH+CHANNEL+PAYLOAD bytes
-    *
-    * Feed raw bytes via feedData(), then poll parseNext() for frames.
-    */
+     * @brief Frame protocol parser for device communication.
+     *
+     * Wire format: [0xAA][LENGTH][CHANNEL][PAYLOAD (8 bytes: double)][CRC8]
+     * - START_BYTE: 0xAA
+     * - LENGTH: payload size + 1 (channel byte)
+     * - CHANNEL: data channel identifier
+     * - PAYLOAD: 8-byte little-endian double value
+     * - CRC8: CRC over LENGTH+CHANNEL+PAYLOAD bytes
+     *
+     * Feed raw bytes via feedData(), then poll parseNext() for frames.
+     */
     class Protocol
     {
     public:
@@ -43,9 +48,9 @@ namespace embview::core
         void feedData(std::span<const uint8_t> data);
 
         /**
-        * @brief Try to parse the next complete frame from the buffer.
-        * @return Parsed DataFrame if a valid frame was found.
-        */
+         * @brief Try to parse the next complete frame from the buffer.
+         * @return Parsed DataFrame if a valid frame was found.
+         */
         std::optional<DataFrame> parseNext();
 
         /**

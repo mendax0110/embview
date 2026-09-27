@@ -2,11 +2,21 @@
 
 #include <memory>
 
+/**
+ * @namespace embview::core Core support.
+ */
 namespace embview::core
 {
+    /**
+     * @brief Raw Data Buffer.
+     * \class RawDataBuffer
+     */
     class RawDataBuffer;
 } // namespace embview::core
 
+/**
+ * @namespace embview::ui Ui support.
+ */
 namespace embview::ui
 {
     /**
@@ -18,9 +28,17 @@ namespace embview::ui
     class HexViewPanel
     {
     public:
+        /**
+         * @brief Create a panel for displaying raw incoming bytes.
+         * @param rawBuffer Buffer containing captured raw bytes.
+         */
         explicit HexViewPanel(std::shared_ptr<core::RawDataBuffer> rawBuffer);
         ~HexViewPanel();
 
+        /**
+         * @brief Render the raw hex dump UI.
+         * @param open Whether the panel is open.
+         */
         void render(bool& open);
 
     private:

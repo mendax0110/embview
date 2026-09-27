@@ -6,11 +6,21 @@
 #include <string>
 #include <vector>
 
+/**
+ * @namespace embview::core Core support.
+ */
 namespace embview::core
 {
+    /**
+     * @brief Device Manager.
+     * \class DeviceManager
+     */
     class DeviceManager;
 } // namespace embview::core
 
+/**
+ * @namespace embview::ui Ui support.
+ */
 namespace embview::ui
 {
     /**
@@ -23,12 +33,23 @@ namespace embview::ui
     class ConnectionPanel
     {
     public:
+        /**
+         * @brief Create a panel for managing device connections.
+         * @param deviceMgr Shared device manager for creating and monitoring connections.
+         */
         explicit ConnectionPanel(std::shared_ptr<core::DeviceManager> deviceMgr);
         ~ConnectionPanel();
 
+        /**
+         * @brief Render the connection UI.
+         * @param open Whether the panel is open.
+         */
         void render(bool& open);
 
     private:
+        /**
+         * @brief Refresh Ports.
+         */
         void refreshPorts();
 
         std::shared_ptr<core::DeviceManager> m_deviceMgr;

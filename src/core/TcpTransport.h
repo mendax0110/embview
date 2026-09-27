@@ -7,9 +7,14 @@
 #include <string>
 #include <vector>
 
+/**
+ * @namespace embview::core Core support.
+ */
 namespace embview::core
 {
-    /// @brief Configuration for TCP socket connections.
+    /**
+     * @brief Configuration for TCP socket connections. \struct TcpConfig
+     */
     struct TcpConfig
     {
         std::string host = "192.168.1.1";
@@ -26,6 +31,10 @@ namespace embview::core
     class TcpTransport : public ITransport
     {
     public:
+        /**
+         * @brief Create a TCP transport with the given configuration.
+         * @param config TCP connection settings.
+         */
         explicit TcpTransport(TcpConfig config);
         ~TcpTransport() override = default;
 
@@ -35,10 +44,35 @@ namespace embview::core
         TcpTransport(const TcpTransport&) = delete;
         TcpTransport& operator=(const TcpTransport&) = delete;
 
+        /**
+         * @brief Open the TCP socket connection.
+         * @return true on success.
+         */
         bool open() override;
+
+        /**
+         * @brief Close the TCP socket.
+         */
         void close() override;
+
+        /**
+         * @brief Check whether the TCP connection is open.
+         * @return true when connected.
+         */
         [[nodiscard]] bool isOpen() const override;
+
+        /**
+         * @brief Read up to @p maxBytes bytes from the socket.
+         * @param maxBytes Maximum number of bytes to read.
+         * @return Bytes received from the peer.
+         */
         std::vector<uint8_t> read(std::size_t maxBytes) override;
+
+        /**
+         * @brief Write data to the TCP socket.
+         * @param data Bytes to send.
+         * @return Number of bytes written.
+         */
         std::size_t write(std::span<const uint8_t> data) override;
 
     private:

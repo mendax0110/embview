@@ -12,8 +12,15 @@
 #define DIAG_UNREGISTER_PTR(name)
 #define DIAG_UPDATE_REFCOUNT(name, refCount)
 
+/**
+ * @namespace embview::core Core support.
+ */
 namespace embview::core
 {
+    /**
+     * @brief Diagnostic Registry.
+     * \struct DiagnosticRegistry
+     */
     struct DiagnosticRegistry
     {
         static DiagnosticRegistry& instance()
@@ -31,6 +38,9 @@ namespace embview::core
 #include <map>
 #include <shared_mutex>
 
+/**
+ * @namespace embview::core Core support.
+ */
 namespace embview::core
 {
     /**
@@ -125,42 +135,42 @@ namespace embview::core
 } // namespace embview::core
 
 /**
- * @brief Helper macro to register a mutex
- * @param name The name of the mutex
- * @param ptr The ptr
+ * @brief Helper macro to register a mutex.
+ * @param name The mutex name.
+ * @param ptr The mutex pointer.
  */
 #define DIAG_REGISTER_MUTEX(name, ptr) \
-    embview::core::DiagnosticRegistry::instance().registerMutex(name, ptr)
+   embview::core::DiagnosticRegistry::instance().registerMutex(name, ptr)
 
 /**
- * @brief Helper macro to unregister a mutex
- * @param name The name of the mutex
+ * @brief Helper macro to unregister a mutex.
+ * @param name The mutex name.
  */
 #define DIAG_UNREGISTER_MUTEX(name) \
-    embview::core::DiagnosticRegistry::instance().unregisterMutex(name)
+   embview::core::DiagnosticRegistry::instance().unregisterMutex(name)
 
 /**
- * @brief Helper macro to register a pointer
- * @param name The name of the pointer
- * @param ptr The actual pointer
- * @param refCount The reference count
+ * @brief Helper macro to register a pointer.
+ * @param name The pointer name.
+ * @param ptr The pointer value.
+ * @param refCount The current reference count.
  */
 #define DIAG_REGISTER_PTR(name, ptr, refCount) \
-    embview::core::DiagnosticRegistry::instance().registerPtr(name, ptr, refCount)
+   embview::core::DiagnosticRegistry::instance().registerPtr(name, ptr, refCount)
 
 /**
- * @brief Helper macro to unregister a pointer
- * @param name The name of the pointer
+ * @brief Helper macro to unregister a pointer.
+ * @param name The pointer name.
  */
 #define DIAG_UNREGISTER_PTR(name) \
-    embview::core::DiagnosticRegistry::instance().unregisterPtr(name)
+   embview::core::DiagnosticRegistry::instance().unregisterPtr(name)
 
 /**
- * @brief Helper macro to update the reference count of a pointer
- * @param name The mame of the reference
- * @param refCount The reference count
+ * @brief Helper macro to update a pointer reference count.
+ * @param name The pointer name.
+ * @param refCount The updated count.
  */
 #define DIAG_UPDATE_REFCOUNT(name, refCount) \
-    embview::core::DiagnosticRegistry::instance().updateRefCount(name, refCount)
+   embview::core::DiagnosticRegistry::instance().updateRefCount(name, refCount)
 
 #endif

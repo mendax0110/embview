@@ -9,17 +9,24 @@
 
 #include <nlohmann/json_fwd.hpp>
 
+/**
+ * @namespace embview::core Core support.
+ */
 namespace embview::core
 {
     /**
-    * @brief Factory for creating transport instances by type name.
-    *
-    * New transport types can be registered at runtime via registerCreator().
-    * Built-in types ("serial") are registered automatically.
-    */
+     * @brief Factory for creating transport instances by type name.
+     *
+     * New transport types can be registered at runtime via registerCreator().
+     * Built-in types ("serial") are registered automatically.
+     */
     class TransportFactory
     {
     public:
+
+        /**
+         * @brief Factory function type for creating transports from JSON config.
+         */
         using Creator = std::function<std::unique_ptr<ITransport>(const nlohmann::json&)>;
 
         /**

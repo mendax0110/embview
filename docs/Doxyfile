@@ -4,10 +4,11 @@ PROJECT_NAME           = "embview"
 PROJECT_NUMBER         = 0.1.0
 PROJECT_BRIEF          = "Embedded Microcontroller Analysis Tool"
 
-OUTPUT_DIRECTORY       = .
-INPUT                  = ../src
-FILE_PATTERNS          = *.h
+OUTPUT_DIRECTORY       = docs
+INPUT                  = src README.md
+FILE_PATTERNS          = *.h *.hpp *.hh *.hxx *.cpp *.cc *.cxx
 RECURSIVE              = YES
+USE_MDFILE_AS_MAINPAGE = README.md
 
 EXTRACT_ALL            = YES
 EXTRACT_PRIVATE        = NO
@@ -15,11 +16,14 @@ EXTRACT_STATIC         = YES
 
 GENERATE_HTML          = YES
 GENERATE_LATEX         = NO
+GENERATE_XML           = NO
 
 HTML_OUTPUT            = html
-HTML_THEME             = light
+HTML_COLORSTYLE        = LIGHT
+HTML_DYNAMIC_MENUS     = YES
+HTML_DYNAMIC_SECTIONS  = YES
 
-QUIET                  = YES
+QUIET                  = NO
 WARNINGS               = YES
 WARN_IF_UNDOCUMENTED   = YES
 
@@ -27,3 +31,22 @@ SOURCE_BROWSER         = YES
 INLINE_SOURCES         = NO
 
 OPTIMIZE_OUTPUT_FOR_C  = NO
+
+HAVE_DOT               = YES
+DOT_PATH               = /usr/bin
+DOT_IMAGE_FORMAT       = svg
+INTERACTIVE_SVG        = YES
+CALL_GRAPH             = YES
+CALLER_GRAPH           = YES
+DIRECTORY_GRAPH        = YES
+INCLUDE_GRAPH          = YES
+INCLUDED_BY_GRAPH      = YES
+GRAPHICAL_HIERARCHY    = YES
+UML_LOOK               = YES
+DOT_GRAPH_MAX_NODES    = 50
+
+TEMPLATE_RELATIONS     = YES
+
+DISABLE_INDEX          = NO
+GENERATE_TREEVIEW      = YES
+FULL_SIDEBAR           = NO

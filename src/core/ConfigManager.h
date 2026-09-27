@@ -5,6 +5,9 @@
 
 #include <nlohmann/json.hpp>
 
+/**
+ * @namespace embview::core Core support.
+ */
 namespace embview::core
 {
     /**

@@ -9,6 +9,9 @@
 #include <string>
 #include <vector>
 
+/**
+ * @namespace embview::core Core support.
+ */
 namespace embview::core
 {
     /**
@@ -20,22 +23,52 @@ namespace embview::core
     class SessionRecorder
     {
     public:
+        /**
+         * @brief Create an empty session recorder.
+         */
         SessionRecorder() = default;
-        ~SessionRecorder();
 
+        /**
+         * @brief Destroy the recorder and close any active file.
+         */
+        ~SessionRecorder();
         SessionRecorder(const SessionRecorder&) = delete;
         SessionRecorder& operator=(const SessionRecorder&) = delete;
 
+        /**
+         * @brief Start Recording.
+         * @param path
+         * @return True on success.
+         */
         bool startRecording(const std::filesystem::path& path);
 
+        /**
+         * @brief Record Frame.
+         * @param frame
+         */
         void recordFrame(const DataFrame& frame);
 
+        /**
+         * @brief Stop Recording.
+         */
         void stopRecording();
 
+        /**
+         * @brief Check whether Recording.
+         * @return True when the condition holds.
+         */
         bool isRecording() const;
 
+        /**
+         * @brief Load Session.
+         * @param path
+         */
         static std::vector<DataFrame> loadSession(const std::filesystem::path& path);
 
+        /**
+         * @brief Recorded Frame Count.
+         * @return The result.
+         */
         std::size_t recordedFrameCount() const;
 
     private:

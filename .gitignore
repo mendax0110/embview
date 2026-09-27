@@ -1,7 +1,7 @@
 build/
 out/
 imgui.ini
-docs/html/
+docs/html
 .vs/
 .cache/
 CMakeSettings.json

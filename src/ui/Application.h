@@ -5,17 +5,43 @@
 #include <string>
 #include "AppTheme.h"
 
+/**
+ * @brief G L F Wwindow.
+ * \struct GLFWwindow
+ */
 struct GLFWwindow;
 
+/**
+ * @namespace embview::core Core support.
+ */
 namespace embview::core
 {
+    /**
+     * @brief Data Store.
+     * \class DataStore
+     */
     class DataStore;
+    /**
+     * @brief Device Manager.
+     * \class DeviceManager
+     */
     class DeviceManager;
+    /**
+     * @brief Log File Manager.
+     * \class LogFileManager
+     */
     class LogFileManager;
 } // namespace embview::core
 
+/**
+ * @namespace embview::ui Ui support.
+ */
 namespace embview::ui
 {
+    /**
+     * @brief Main Window.
+     * \class MainWindow
+     */
     class MainWindow;
 
     /**
@@ -27,21 +53,55 @@ namespace embview::ui
     class Application
     {
     public:
+        /**
+         * @brief Create the application shell.
+         */
         Application();
-        ~Application();
 
+        /**
+         * @brief Destroy the application and release owned resources.
+         */
+        ~Application();
         Application(const Application&) = delete;
         Application& operator=(const Application&) = delete;
 
+        /**
+         * @brief Initialize the app and main window.
+         * @param logFileMgr Shared log manager used by the UI.
+         * @param title Window title.
+         * @param width Window width.
+         * @param height Window height.
+         * @return true on success.
+         */
         bool init(std::shared_ptr<core::LogFileManager> logFileMgr, const std::string& title = "embview", int width = 1280, int height = 720);
 
+        /**
+         * @brief Run the application event loop.
+         */
         void run();
+
+        /**
+         * @brief Shut down the application.
+         */
         void shutdown();
 
+        /**
+         * @brief Set the UI color mode.
+         * @param mode Target color mode.
+         */
         void setUiMode(ColorMode mode);
-        ColorMode getUiMode() const;
+
+        /**
+         * @brief Get the active UI color mode.
+         * @return Current color mode.
+         */
+        [[nodiscard]] ColorMode getUiMode() const;
 
     private:
+        /**
+         * @brief Apply a DPI scaling factor.
+         * @param scale DPI scale multiplier.
+         */
         void applyDpiScale(float scale);
 
         GLFWwindow* m_window = nullptr;

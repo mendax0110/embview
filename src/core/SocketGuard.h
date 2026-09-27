@@ -20,6 +20,9 @@
 #include <cstdint>
 #include <utility>
 
+/**
+ * @namespace embview::core Core support.
+ */
 namespace embview::core
 {
     /// @brief RAII wrapper for Winsock initialization (WSAStartup / WSACleanup).
@@ -29,7 +32,10 @@ namespace embview::core
     public:
         WsaGuard() = default;
 
-        /// @brief Initializes Winsock. Returns false on failure.
+        /**
+         * @brief Initialize the Winsock subsystem.
+         * @return true on success.
+         */
         bool init()
         {
 #ifdef _WIN32
@@ -40,6 +46,10 @@ namespace embview::core
             WSADATA wsaData;
             if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
             {
+                /**
+                * @brief Spdlog::error.
+                * @return The result.
+                */
                 spdlog::error("WSAStartup failed");
                 return false;
             }
@@ -53,6 +63,10 @@ namespace embview::core
 #ifdef _WIN32
             if (m_initialized)
             {
+                /**
+                * @brief W S A Cleanup.
+                * @return The result.
+                */
                 WSACleanup();
             }
 #endif
@@ -72,8 +86,16 @@ namespace embview::core
 #ifdef _WIN32
                 if (m_initialized)
                 {
+                    /**
+                    * @brief W S A Cleanup.
+                    * @return The result.
+                    */
                     WSACleanup();
                 }
+                /**
+                * @brief Std::exchange.
+                * @return The result.
+                */
                 m_initialized = std::exchange(other.m_initialized, false);
 #endif
             }
@@ -135,16 +157,19 @@ namespace embview::core
         /// @brief Returns true if the socket is valid (not closed / never opened).
         [[nodiscard]] bool valid() const { return m_socket != kInvalid; }
 
-        /// @brief Implicit bool: true when holding a valid socket.
+        /// @brief Implicit bool conversion for socket validity checks.
+        /// @return true when this guard owns a valid socket.
         explicit operator bool() const { return valid(); }
 
-        /// @brief Releases ownership and returns the raw handle without closing.
+        /// @brief Release ownership of the current socket handle.
+        /// @return The raw socket handle without closing it.
         NativeHandle release()
         {
             return std::exchange(m_socket, kInvalid);
         }
 
-        /// @brief Closes the current socket (if valid) and takes ownership of a new one.
+        /// @brief Close the current socket and replace it with a new handle.
+        /// @param newSock Replacement handle to take ownership of, or kInvalid to close the current socket.
         void reset(const NativeHandle newSock = kInvalid)
         {
             if (m_socket != kInvalid)
@@ -158,12 +183,12 @@ namespace embview::core
             m_socket = newSock;
         }
 
-        /// @brief Sets the socket to non-blocking mode.
+        /// @brief Set the socket to non-blocking mode.
         void setNonBlocking() const
         {
             if (m_socket == kInvalid)
             {
-                return;
+               return;
             }
 #ifdef _WIN32
             u_long mode = 1;
@@ -295,9 +320,16 @@ namespace embview::core
                 return false;
             }
 
+            /**
+            * @brief Set Non Blocking.
+            */
             setNonBlocking();
 
 #ifdef _WIN32
+            /**
+            * @brief Sizeof.
+            * @return The result.
+            */
             int connectResult = ::connect(m_socket,
                                            reinterpret_cast<const sockaddr*>(&addr),
                                            sizeof(addr));
@@ -312,10 +344,18 @@ namespace embview::core
                 }
 
                 fd_set writeFds;
+                /**
+                * @brief F D Z E R O.
+                * @return The result.
+                */
                 FD_ZERO(&writeFds);
                 FD_SET(m_socket, &writeFds);
 
                 fd_set exceptFds;
+                /**
+                * @brief F D Z E R O.
+                * @return The result.
+                */
                 FD_ZERO(&exceptFds);
                 FD_SET(m_socket, &exceptFds);
 
@@ -337,6 +377,10 @@ namespace embview::core
                 }
             }
 #else
+            /**
+            * @brief Sizeof.
+            * @return The result.
+            */
             const int connectResult = ::connect(m_socket, reinterpret_cast<const sockaddr*>(&addr),sizeof(addr));
 
             if (connectResult < 0)
@@ -348,6 +392,10 @@ namespace embview::core
                 }
 
                 fd_set writeFds;
+                /**
+                * @brief F D Z E R O.
+                * @return The result.
+                */
                 FD_ZERO(&writeFds);
                 FD_SET(m_socket, &writeFds);
 
@@ -376,6 +424,10 @@ namespace embview::core
         static SocketGuard createTcp()
         {
 #ifdef _WIN32
+            /**
+            * @brief Socket Guard.
+            * @return The result.
+            */
             SOCKET sock = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
             return SocketGuard(sock);
 #else
@@ -387,6 +439,10 @@ namespace embview::core
         static SocketGuard createUdp()
         {
 #ifdef _WIN32
+            /**
+            * @brief Socket Guard.
+            * @return The result.
+            */
             SOCKET sock = ::socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
             return SocketGuard(sock);
 #else

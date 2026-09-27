@@ -5,11 +5,21 @@
 #include <string>
 #include <vector>
 
+/**
+ * @namespace embview::core Core support.
+ */
 namespace embview::core
 {
+    /**
+     * @brief Device Manager.
+     * \class DeviceManager
+     */
     class DeviceManager;
 } // namespace embview::core
 
+/**
+ * @namespace embview::ui Ui support.
+ */
 namespace embview::ui
 {
     /**
@@ -25,14 +35,35 @@ namespace embview::ui
     class CommandPanel
     {
     public:
+        /**
+         * @brief Construct the command panel.
+         * @param deviceMgr Shared device manager used to send commands.
+         */
         explicit CommandPanel(std::shared_ptr<core::DeviceManager> deviceMgr);
+
+        /**
+         * @brief Destroy the command panel.
+         */
         ~CommandPanel();
 
+        /**
+         * @brief Render the command panel.
+         * @param open Whether the panel is open.
+         */
         void render(bool& open);
 
     private:
+        /**
+         * @brief Parse a hexadecimal string into raw bytes.
+         * @param hex Hexadecimal text to decode.
+         * @return Decoded byte values.
+         */
         static std::vector<uint8_t> parseHexString(const std::string& hex);
 
+        /**
+         * @brief History Entry.
+         * \struct HistoryEntry
+         */
         struct HistoryEntry
         {
             std::string device;

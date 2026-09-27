@@ -1,5 +1,8 @@
 #pragma once
 
+/**
+ * @namespace embview::ui Ui support.
+ */
 namespace embview::ui
 {
     /**
@@ -14,6 +17,10 @@ namespace embview::ui
         NumberConverterPanel() = default;
         ~NumberConverterPanel() = default;
 
+        /**
+         * @brief Render the numeric conversion UI.
+         * @param open Whether the panel is open.
+         */
         void render(bool& open);
 
     private:

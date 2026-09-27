@@ -12,9 +12,20 @@
 #include <thread>
 #include <vector>
 
+/**
+ * @namespace embview::core Core support.
+ */
 namespace embview::core
 {
+    /**
+     * @brief Data Store.
+     * \class DataStore
+     */
     class DataStore;
+    /**
+     * @brief Raw Data Buffer.
+     * \class RawDataBuffer
+     */
     class RawDataBuffer;
 
     /**
@@ -27,6 +38,10 @@ namespace embview::core
     class DeviceManager
     {
     public:
+        /**
+        * @brief Create a device manager bound to a shared data store.
+        * @param dataStore Shared store that receives decoded frames.
+        */
         explicit DeviceManager(std::shared_ptr<DataStore> dataStore);
         ~DeviceManager();
 

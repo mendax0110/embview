@@ -4,6 +4,9 @@
 #include <string>
 #include <unordered_map>
 
+/**
+ * @namespace embview::core Core support.
+ */
 namespace embview::core
 {
     /**
