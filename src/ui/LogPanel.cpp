@@ -56,7 +56,7 @@ LogPanel::LogPanel()
 LogPanel::~LogPanel()
 {
     auto& sinks = spdlog::default_logger()->sinks();
-    sinks.erase(std::remove(sinks.begin(), sinks.end(), m_sink), sinks.end());
+    std::erase(sinks, m_sink);
 }
 
 void LogPanel::render(bool& open)

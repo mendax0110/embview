@@ -30,7 +30,7 @@ std::size_t FftPanel::nextPow2(const std::size_t n)
 
 void FftPanel::fft(std::vector<double>& real, std::vector<double>& imag)
 {
-    std::size_t n = real.size();
+    const std::size_t n = real.size();
     if (n <= 1)
     {
         return;

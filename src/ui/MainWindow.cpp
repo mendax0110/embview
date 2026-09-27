@@ -57,7 +57,7 @@ MainWindow::MainWindow(std::shared_ptr<DataStore> dataStore,
 
 MainWindow::~MainWindow()
 {
-    m_configMgr->save();
+    (void)m_configMgr->save();
 }
 
 void MainWindow::render()
@@ -98,11 +98,11 @@ void MainWindow::renderMenuBar()
         {
             if (ImGui::MenuItem("Save Config"))
             {
-                m_configMgr->save();
+                (void)m_configMgr->save();
             }
             if (ImGui::MenuItem("Load Config"))
             {
-                m_configMgr->load();
+                (void)m_configMgr->load();
             }
             ImGui::Separator();
             if (ImGui::MenuItem("Exit", "Alt+F4"))

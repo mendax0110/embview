@@ -5,32 +5,35 @@ using namespace embview::ui::appTheme;
 
 static ImVec4 hex(const unsigned int rgb, const float a = 1.0f)
 {
-    return ImVec4(
+    return {
         ((rgb >> 16) & 0xFF) / 255.0f,
         ((rgb >> 8) & 0xFF) / 255.0f,
         ((rgb >> 0) & 0xFF) / 255.0f,
         a
-    );
+    };
 }
 
 static ImVec4 lerp(const ImVec4 a, const ImVec4 b, const float t)
 {
-    return ImVec4(
+    return {
         a.x + (b.x - a.x) * t,
         a.y + (b.y - a.y) * t,
         a.z + (b.z - a.z) * t,
         a.w + (b.w - a.w) * t
-    );
+    };
 }
 
-struct Palette
+namespace
 {
-    ImVec4 bg, surface, surface2, border, borderHov;
-    ImVec4 textPri, textSec, textHint;
-    ImVec4 accent, accentHov, accentAct, accentText;
-    ImVec4 ok, okBg, warn, warnBg, err, errBg;
-    ImVec4 transparent;
-};
+    struct Palette
+    {
+        ImVec4 bg, surface, surface2, border, borderHov;
+        ImVec4 textPri, textSec, textHint;
+        ImVec4 accent, accentHov, accentAct, accentText;
+        ImVec4 ok, okBg, warn, warnBg, err, errBg;
+        ImVec4 transparent;
+    };
+}
 
 static Palette lightPalette()
 {

@@ -125,7 +125,7 @@ void NumberConverterPanel::render(bool& open)
     ImGui::Text("Octal:    0o%llo", static_cast<unsigned long long>(val));
 
     // Binary
-    std::string binStr = toBinaryString(val, bits);
+    const std::string binStr = toBinaryString(val, bits);
     ImGui::Text("Binary:   0b%s", binStr.c_str());
 
     // IEEE 754 interpretation

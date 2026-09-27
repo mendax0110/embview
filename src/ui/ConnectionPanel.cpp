@@ -35,10 +35,10 @@ void ConnectionPanel::render(bool& open)
     // Check if an async connection attempt completed
     if (m_connecting && m_connectFuture.valid())
     {
-        auto status = m_connectFuture.wait_for(std::chrono::milliseconds(0));
+        const auto status = m_connectFuture.wait_for(std::chrono::milliseconds(0));
         if (status == std::future_status::ready)
         {
-            bool success = m_connectFuture.get();
+            const bool success = m_connectFuture.get();
             m_connecting = false;
             if (success)
             {
@@ -87,7 +87,7 @@ void ConnectionPanel::render(bool& open)
             {
                 for (int i = 0; i < static_cast<int>(m_availablePorts.size()); ++i)
                 {
-                    bool isSelected = (m_selectedPort == i);
+                    const bool isSelected = (m_selectedPort == i);
                     if (ImGui::Selectable(m_availablePorts[i].c_str(), isSelected))
                     {
                         m_selectedPort = i;
@@ -107,13 +107,13 @@ void ConnectionPanel::render(bool& open)
 
         // Baud rate
         {
-            std::string baudLabel = std::to_string(BAUD_RATES[m_selectedBaud]);
+            const std::string baudLabel = std::to_string(BAUD_RATES[m_selectedBaud]);
             if (ImGui::BeginCombo("Baud Rate", baudLabel.c_str()))
             {
                 for (int i = 0; i < BAUD_RATE_COUNT; ++i)
                 {
                     std::string label = std::to_string(BAUD_RATES[i]);
-                    bool isSelected = (m_selectedBaud == i);
+                    const bool isSelected = (m_selectedBaud == i);
                     if (ImGui::Selectable(label.c_str(), isSelected))
                     {
                         m_selectedBaud = i;
@@ -144,7 +144,7 @@ void ConnectionPanel::render(bool& open)
     ImGui::Separator();
 
     // Connect button
-    bool canConnect = !m_connecting && ((m_transportType == 0) ? !m_availablePorts.empty() : true);
+    const bool canConnect = !m_connecting && ((m_transportType == 0) ? !m_availablePorts.empty() : true);
     if (!canConnect)
     {
         ImGui::BeginDisabled();
@@ -177,8 +177,7 @@ void ConnectionPanel::render(bool& open)
                 config["broadcast"] = m_udpBroadcast;
             }
 
-            auto transport = std::shared_ptr<ITransport>(
-                TransportFactory::instance().create(type, config).release());
+            auto transport = std::shared_ptr<ITransport>(TransportFactory::instance().create(type, config).release());
 
             auto protoMode = static_cast<ProtocolMode>(m_protocolMode);
             std::string name(m_deviceName);
@@ -276,7 +275,7 @@ void ConnectionPanel::render(bool& open)
     // Connected devices list
     ImGui::Text("Connected Devices:");
 
-    auto names = m_deviceMgr->getDeviceNames();
+    const auto names = m_deviceMgr->getDeviceNames();
     if (names.empty())
     {
         ImGui::TextDisabled("None");
@@ -285,7 +284,7 @@ void ConnectionPanel::render(bool& open)
     {
         for (const auto& name : names)
         {
-            bool connected = m_deviceMgr->isDeviceConnected(name);
+            const bool connected = m_deviceMgr->isDeviceConnected(name);
             if (connected)
             {
                 ImGui::TextColored(ImVec4(0.3f, 0.85f, 0.45f, 1.0f), "%s", name.c_str());

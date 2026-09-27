@@ -18,12 +18,12 @@ using namespace embview::cli;
 
 namespace
 {
-std::atomic<bool> g_running{true};
+    std::atomic<bool> g_running{true};
 
-void signalHandler(int)
-{
-    g_running = false;
-}
+    void signalHandler(int)
+    {
+        g_running = false;
+    }
 } // namespace
 
 int CliApp::run(const std::vector<std::string>& args)

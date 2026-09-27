@@ -145,7 +145,7 @@ void PlotPanel::render(bool& open)
                     }
                     else
                     {
-                        auto col = ImPlot::GetColormapColor(ch);
+                        const auto col = ImPlot::GetColormapColor(ch);
                         color[0] = col.x;
                         color[1] = col.y;
                         color[2] = col.z;

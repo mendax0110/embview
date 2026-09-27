@@ -127,15 +127,15 @@ void CommandPanel::render(bool& open)
                 switch (m_lineEnding)
                 {
                     case 0: text += "\r\n"; break;
-                    case 1: text += "\n"; break;
-                    case 2: text += "\r"; break;
+                    case 1: text += '\n'; break;
+                    case 2: text += '\r'; break;
                     default: break;
                 }
 
                 std::vector<uint8_t> bytes(text.begin(), text.end());
                 m_deviceMgr->sendRaw(targetDevice, bytes);
 
-                m_history.push_back({targetDevice, std::format("TEXT: {}", m_textInput)});
+                m_history.push_back({.device = targetDevice, .text = std::format("TEXT: {}", m_textInput)});
                 m_textInput[0] = '\0';
             }
         }
@@ -188,7 +188,7 @@ void CommandPanel::render(bool& open)
 
             m_deviceMgr->sendCommand(targetDevice, frame);
 
-            m_history.push_back({targetDevice, std::format("FRAME: ch={} val={:.6f}", m_channel, m_value)});
+            m_history.push_back({.device = targetDevice, .text = std::format("FRAME: ch={} val={:.6f}", m_channel, m_value)});
         }
     }
 
